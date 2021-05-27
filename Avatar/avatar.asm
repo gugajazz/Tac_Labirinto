@@ -201,7 +201,6 @@ CICLO:		goto_xy	POSxa,POSya		; Vai para a posi��o anterior do cursor
 			mov		ah, 02h			; IMPRIME caracter da posi��o no canto
 			mov		dl, Car	
 			int		21H			    ; write character to standard output | DL = character to write | after execution AL = DL
-
 	
 			goto_xy	POSx,POSy		; Vai para posi��o do cursor
 
