@@ -49,7 +49,7 @@ dseg	segment para public 'data'
 		Car				db	32	; Guarda um caracter do Ecran 
 		Cor				db	7	; Guarda os atributos de cor do caracter
 		POSy			db	3	; a linha pode ir de [1 .. 25]
-		POSx			db	3	; POSx pode ir [1..80]
+		POSx			db	3	; POSx pode ir [1..80]	
 		POSx2			db	3	; POSx pode ir [1..80]	
 		POSya			db	3	; Posi��o anterior de y
 		POSxa			db	3	; Posi��o anterior de x
@@ -66,16 +66,16 @@ goto_xy	macro		POSx,POSy
 		mov		bh,0		; numero da p�gina
 		mov		dl,POSx
 		mov		dh,POSy
-		int		10h ;INT 10h 2 -> set cursor position | DH = row | DL = column | BH = page number (0..7)
+		int		10h
 endm
 
 ;########################################################################
 ; MOSTRA - Faz o display de uma string terminada em $
 
 MOSTRA MACRO STR 
-	MOV AH,09H
-	LEA DX,STR 
-	INT 21H
+MOV AH,09H
+LEA DX,STR 
+INT 21H
 ENDM
 
 ; FIM DAS MACROS
@@ -111,7 +111,7 @@ IMP_FICH	PROC
         int     21h
         jc      erro_abrir
         mov     HandleFich,ax
-        jmp     ler_ciclo ;salta para ler_ciclo
+        jmp     ler_ciclo
 
 erro_abrir:
         mov     ah,09h
@@ -124,7 +124,7 @@ ler_ciclo:
         mov     bx,HandleFich
         mov     cx,1
         lea     dx,car_fich
-        int     21h			;read from file | BX = file handle | CX = number of bytes to read | DS:DX -> buffer for data
+        int     21h
 		jc		erro_ler
 		cmp		ax,0		;EOF?
 		je		fecha_ficheiro
@@ -159,10 +159,10 @@ IMP_FICH	endp
 LE_TECLA	PROC
 		
 		mov		ah,08h
-		int		21h      ;
+		int		21h
 		mov		ah,0
 		cmp		al,0
-		jne		SAI_TECLA ;saltar para sai_tecla se nao zero
+		jne		SAI_TECLA
 		mov		ah, 08h
 		int		21h
 		mov		ah,1
@@ -175,8 +175,10 @@ LE_TECLA	endp
 ; Avatar
 
 AVATAR	PROC
+			xor di,di		
 			mov		ax,0B800h
 			mov		es,ax
+			mov 	POSx2, 10
 
 			goto_xy	POSx,POSy		; Vai para nova possi��o
 			mov 	ah, 08h		; Guarda o Caracter que est� na posi��o do Cursor
@@ -191,28 +193,32 @@ IMPRIMEPalavra:	goto_xy 10,20
 				lea dx, String_nome
 				mov ah, 09h
 				int 21h
-
+	
 
 CICLO:		goto_xy	POSxa,POSya		; Vai para a posi��o anterior do cursor
 			mov		ah, 02h
 			mov		dl, Car			; Repoe Caracter guardado 
-			int		21H				; write character to standard output | DL = character to write | after execution AL = DL
+			int		21H		
 		
 			goto_xy	POSx,POSy		; Vai para nova possi��o
 			mov 	ah, 08h
 			mov		bh,0			; numero da p�gina
-			int		10h				; read character and attribute at cursor position | BH = page number | return: AH = attribute AL = character.
+			int		10h		
 			mov		Car, al			; Guarda o Caracter que est� na posi��o do Cursor
 			mov		Cor, ah			; Guarda a cor que est� na posi��o do Cursor
 		
 			goto_xy	78,0			; Mostra o caractr que estava na posi��o do AVATAR
 			mov		ah, 02h			; IMPRIME caracter da posi��o no canto
 			mov		dl, Car	
-			int		21H			    ; write character to standard output | DL = character to write | after execution AL = DL
+			int		21H			
 	
 			goto_xy	POSx,POSy		; Vai para posi��o do cursor
 			xor si, si
 
+
+
+
+	
 VERIFICA:	mov ah, String_nome[si]
 			cmp ah, '$'
 			je 	IMPRIME
@@ -220,6 +226,7 @@ VERIFICA:	mov ah, String_nome[si]
 			je	IMPRIMEGame
 			inc si
 			jmp VERIFICA
+
 
 IMPRIME:	goto_xy	POSx,POSy
 			mov		ah, 02h
@@ -235,8 +242,8 @@ IMPRIME:	goto_xy	POSx,POSy
 LER_SETA:	call 	LE_TECLA
 			cmp		ah, 1
 			je		ESTEND
-			CMP 	AL, 27	 ; ESCAPE  | subtract second from first for flags 
-			JE		FIM      ;jump if zero
+			CMP 	AL, 27	; ESCAPE
+			JE		FIM
 			jmp		LER_SETA
 		
 ESTEND:		cmp 	al,48h
@@ -298,6 +305,12 @@ IMPRIMEGame:	mov al, Car
 				inc POSx2
 				inc di
 				jmp IMPRIME
+				
+				
+				
+
+
+
 fim:				
 			RET
 AVATAR		endp
@@ -313,12 +326,12 @@ Main  proc
 		
 		call		apaga_ecran
 		goto_xy		0,0
-		call		IMP_FICH  ;abrir o ficheiro acho
-		call 		AVATAR    ;
-		goto_xy		0,22		;macro para mexer o boneco acho
+		call		IMP_FICH
+		call 		AVATAR
+		goto_xy		0,22
 		
 		mov			ah,4CH
-		INT			21H     ;return control to the operating system (stop program)
+		INT			21H
 Main	endp
 Cseg	ends
 end	Main
