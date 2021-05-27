@@ -31,7 +31,7 @@ dseg	segment para public 'data'
 
 		String_num 		db 		"  0 $"
         String_nome  	db	    "ISEC$"	
-		Construir_nome	db	    "            $"	
+		Construir_nome	db	    "  		$"	
 		Dim_nome		dw		5	; Comprimento do Nome
 		indice_nome		dw		0	; indice que aponta para Construir_nome
 		
@@ -189,7 +189,7 @@ AVATAR	PROC
 	
 
 
-IMPRIMEPalavra:	goto_xy 10,20
+IMPRIME_PALAVRA:	goto_xy 10,20
 				lea dx, String_nome
 				mov ah, 09h
 				int 21h
@@ -214,16 +214,24 @@ CICLO:		goto_xy	POSxa,POSya		; Vai para a posi��o anterior do cursor
 	
 			goto_xy	POSx,POSy		; Vai para posi��o do cursor
 			xor si, si
+			xor bx, bx
 
 
 
+VERIFICA_REP:	mov ah, Construir_nome[bx]
+				cmp ah, '$'
+				je 	VERIFICA
+				cmp	Car, ah		
+				je	IMPRIME
+				inc bx
+				jmp VERIFICA_REP
 
 	
 VERIFICA:	mov ah, String_nome[si]
 			cmp ah, '$'
 			je 	IMPRIME
 			cmp	Car, ah		
-			je	IMPRIMEGame
+			je	IMPRIME_GAME
 			inc si
 			jmp VERIFICA
 
@@ -296,7 +304,7 @@ DIREITA:
 			dec		POSx
 			jmp		CICLO
 
-IMPRIMEGame:	mov al, Car
+IMPRIME_GAME:	mov al, Car
 				mov Construir_nome[di], al
 				goto_xy POSx2,21
 				mov ah, 02h	
