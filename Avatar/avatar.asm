@@ -213,11 +213,20 @@ CICLO:		goto_xy	POSxa,POSya		; Vai para a posi��o anterior do cursor
 			goto_xy	POSx,POSy		; Vai para posi��o do cursor
 			xor si, si
 
+			VERIFICA_REP:	mov ah, Construir_nome[bx]
+				cmp ah, '$'
+				je 	VERIFICA
+				cmp	Car, ah		
+				je	IMPRIME
+				inc bx
+				jmp VERIFICA_REP
+			
+
 VERIFICA:	mov ah, String_nome[si]
 			cmp ah, '$'
 			je 	IMPRIME
 			cmp	Car, ah		
-			je	IMPRIMEGame
+			je	IMPRIME_GAME
 			inc si
 			jmp VERIFICA
 
