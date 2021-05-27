@@ -65,16 +65,16 @@ goto_xy	macro		POSx,POSy
 		mov		bh,0		; numero da p�gina
 		mov		dl,POSx
 		mov		dh,POSy
-		int		10h
+		int		10h ;INT 10h 2 -> set cursor position | DH = row | DL = column | BH = page number (0..7)
 endm
 
 ;########################################################################
 ; MOSTRA - Faz o display de uma string terminada em $
 
 MOSTRA MACRO STR 
-MOV AH,09H
-LEA DX,STR 
-INT 21H
+	MOV AH,09H
+	LEA DX,STR 
+	INT 21H
 ENDM
 
 ; FIM DAS MACROS
@@ -110,7 +110,7 @@ IMP_FICH	PROC
         int     21h
         jc      erro_abrir
         mov     HandleFich,ax
-        jmp     ler_ciclo
+        jmp     ler_ciclo ;salta para ler_ciclo
 
 erro_abrir:
         mov     ah,09h
@@ -123,7 +123,7 @@ ler_ciclo:
         mov     bx,HandleFich
         mov     cx,1
         lea     dx,car_fich
-        int     21h
+        int     21h			;read from file | BX = file handle | CX = number of bytes to read | DS:DX -> buffer for data
 		jc		erro_ler
 		cmp		ax,0		;EOF?
 		je		fecha_ficheiro
@@ -188,21 +188,23 @@ AVATAR	PROC
 CICLO:		goto_xy	POSxa,POSya		; Vai para a posi��o anterior do cursor
 			mov		ah, 02h
 			mov		dl, Car			; Repoe Caracter guardado 
-			int		21H		
+			int		21H				; write character to standard output | DL = character to write | after execution AL = DL
 		
 			goto_xy	POSx,POSy		; Vai para nova possi��o
 			mov 	ah, 08h
 			mov		bh,0			; numero da p�gina
-			int		10h		
+			int		10h				; read character and attribute at cursor position | BH = page number | return: AH = attribute AL = character.
 			mov		Car, al			; Guarda o Caracter que est� na posi��o do Cursor
 			mov		Cor, ah			; Guarda a cor que est� na posi��o do Cursor
 		
 			goto_xy	78,0			; Mostra o caractr que estava na posi��o do AVATAR
 			mov		ah, 02h			; IMPRIME caracter da posi��o no canto
 			mov		dl, Car	
-			int		21H			
+			int		21H			    ; write character to standard output | DL = character to write | after execution AL = DL
+
 	
 			goto_xy	POSx,POSy		; Vai para posi��o do cursor
+
 IMPRIME:	mov		ah, 02h
 			mov		dl, 190	; Coloca AVATAR
 			int		21H	
@@ -216,8 +218,8 @@ IMPRIME:	mov		ah, 02h
 LER_SETA:	call 	LE_TECLA
 			cmp		ah, 1
 			je		ESTEND
-			CMP 	AL, 27	; ESCAPE
-			JE		FIM
+			CMP 	AL, 27	 ; ESCAPE  | subtract second from first for flags 
+			JE		FIM      ;jump if zero
 			jmp		LER_SETA
 		
 ESTEND:		cmp 	al,48h
@@ -285,12 +287,12 @@ Main  proc
 		
 		call		apaga_ecran
 		goto_xy		0,0
-		call		IMP_FICH
-		call 		AVATAR
-		goto_xy		0,22
+		call		IMP_FICH  ;abrir o ficheiro acho
+		call 		AVATAR    ;
+		goto_xy		0,22		;macro para mexer o boneco acho
 		
 		mov			ah,4CH
-		INT			21H
+		INT			21H     ;return control to the operating system (stop program)
 Main	endp
 Cseg	ends
 end	Main
