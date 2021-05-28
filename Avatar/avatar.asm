@@ -31,7 +31,7 @@ dseg	segment para public 'data'
 
 		String_num 		db 		"  0 $"
         String_nome  	db	    "ISEC$"	
-		Construir_nome	db	    "  		$"
+		Construir_nome	db	    "____$"
 		Dim_nome		dw		5	; Comprimento do Nome
 		indice_nome		dw		0	; indice que aponta para Construir_nome
 		
@@ -50,7 +50,6 @@ dseg	segment para public 'data'
 		Cor				db	7	; Guarda os atributos de cor do caracter
 		POSy			db	3	; a linha pode ir de [1 .. 25]
 		POSx			db	3	; POSx pode ir [1..80]
-		POSx2			db	3	; POSx pode ir [1..80]	
 		POSya			db	3	; Posi��o anterior de y
 		POSxa			db	3	; Posi��o anterior de x
 dseg	ends
@@ -175,10 +174,9 @@ LE_TECLA	endp
 ; Avatar
 
 AVATAR	PROC
-			xor di,di
 			mov		ax,0B800h
 			mov		es,ax
-			mov 	POSx2, 10
+
 
 			goto_xy	POSx,POSy		; Vai para nova possi��o
 			mov 	ah, 08h		; Guarda o Caracter que est� na posi��o do Cursor
@@ -190,9 +188,9 @@ AVATAR	PROC
 
 
 IMPRIME_PALAVRA:	goto_xy 10,20
-				lea dx, String_nome
-				mov ah, 09h
-				int 21h
+					lea dx, String_nome
+					mov ah, 09h
+					int 21h
 
 
 CICLO:		goto_xy	POSxa,POSya		; Vai para a posi��o anterior do cursor
@@ -214,14 +212,14 @@ CICLO:		goto_xy	POSxa,POSya		; Vai para a posi��o anterior do cursor
 	
 			goto_xy	POSx,POSy		; Vai para posi��o do cursor
 			xor si, si
-			xor bx, bx
+			xor di, di
 
-			VERIFICA_REP:	mov ah, Construir_nome[bx]
+VERIFICA_REP:	mov ah, Construir_nome[di]
 				cmp ah, '$'
 				je 	VERIFICA
 				cmp	Car, ah		
 				je	IMPRIME
-				inc bx
+				inc di
 				jmp VERIFICA_REP
 			
 
@@ -302,13 +300,11 @@ DIREITA:
 			jmp		CICLO
 
 IMPRIME_GAME:	mov al, Car
-				mov Construir_nome[di], al
-				goto_xy POSx2,21
-				mov ah, 02h	
-				mov dl, Construir_nome[di]		
+				mov Construir_nome[si], al
+				goto_xy 10,21
+				mov ah, 09h	
+				lea dx, Construir_nome
 				int 21h
-				inc POSx2
-				inc di
 				jmp IMPRIME
 fim:				
 			RET
