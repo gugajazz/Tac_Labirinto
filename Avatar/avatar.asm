@@ -24,6 +24,9 @@ dseg	segment para public 'data'
 		Horas			dw		0				; Vai guardar a HORA actual
 		Minutos			dw		0				; Vai guardar os minutos actuais
 		Segundos		dw		0				; Vai guardar os segundos actuais
+
+		cur_seconds     db    	0				;seg atuais
+
 		Old_seg			dw		0				; Guarda os �ltimos segundos que foram lidos
 		Tempo_init		dw		0				; Guarda O Tempo de inicio do jogo
 		Tempo_j			dw		0				; Guarda O Tempo que decorre o  jogo
@@ -237,13 +240,26 @@ CICLO:		goto_xy	POSxa,POSya		; Vai para a posi��o anterior do cursor
 			goto_xy	POSx,POSy		; Vai para posi��o do cursor
 			xor si, si
 			xor di, di
+
 ;»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»
 mov  si, offset numstr
 mov  ax, Tempo_j
 call number2string    ;RETURNS NUMSTR.
 
-jmp IMPRIME_TEMPO ;TESTING
+;jmp IMPRIME_TEMPO ;TESTING
+;jmp HOUR
 ;««««««««««««««««««««««««««««««««««««««««««««««
+
+; IMPRIME_TEMPO:	goto_xy 59,0 ;primeiro num=x segundo num=y
+; 				mov ah, 09h
+; 				lea dx, String_TJ ;string acabada em $ que queremos imprimir
+; 				int 21h
+				
+; 				goto_xy 58,0 ;primeiro num=x segundo num=y
+; 				mov  ah, 9
+;          		mov  dx, offset numstr
+;          		int 21h 
+				;jmp IMPRIME
 
 VERIFICA_REP:	mov ah, Construir_nome[di]
 				cmp ah, '$' ;sets zero flag se ah == $
@@ -338,16 +354,69 @@ IMPRIME_GAME:	mov al, Car
 				int 21h
 				jmp IMPRIME
 
-IMPRIME_TEMPO:	goto_xy 59,0 ;primeiro num=x segundo num=y
-				mov ah, 09h
-				lea dx, String_TJ ;string acabada em $ que queremos imprimir
-				int 21h
-				
-				goto_xy 58,0 ;primeiro num=x segundo num=y
-				mov  ah, 9
-         		mov  dx, offset numstr
-         		int 21h 
-				jmp IMPRIME
+
+HOUR:
+MOV AH,2CH    ; To get System Time
+INT 21H
+MOV AL,CH     ; Hour is in CH
+AAM
+MOV BX,AX
+CALL DISP
+
+MOV DL,':'
+MOV AH,02H    ; To Print : in DOS
+INT 21H
+
+;Minutes Part
+MINUTES:
+MOV AH,2CH    ; To get System Time
+INT 21H
+MOV AL,CL     ; Minutes is in CL
+AAM
+MOV BX,AX
+CALL DISP
+
+MOV DL,':'    ; To Print : in DOS
+MOV AH,02H
+INT 21H
+
+;Seconds Part
+Seconds:
+MOV AH,2CH    ; To get System Time
+INT 21H
+MOV AL,DH     ; Seconds is in DH
+
+AAM
+MOV BX,AX
+CALL DISP
+
+;=========================
+
+; WAITING:
+; MOV AH,2CH    ; To get System Time
+; INT 21H         ; Seconds is in DH
+
+; cmp  dh, cur_seconds  ;◄■■ IF SECONDS ARE THE SAME...
+; ;je   WAITING     ;    ...WE ARE STILL IN THE SAME SECONDS.
+; je	  IMPRIME_PALAVRA
+; mov  cur_seconds, dh  ;◄■■ SECONDS CHANGED. PRESERVE NEW SECONDS.
+
+
+; jmp Hour
+
+;=========================
+
+DISP PROC
+MOV DL,BH      ; Since the values are in BX, BH Part
+ADD DL,30H     ; ASCII Adjustment
+MOV AH,02H     ; To Print in DOS
+INT 21H
+MOV DL,BL      ; BL Part 
+ADD DL,30H     ; ASCII Adjustment
+MOV AH,02H     ; To Print in DOS
+INT 21H
+RET
+DISP ENDP      ; End Disp Procedure
 
 fim:				
 			RET
