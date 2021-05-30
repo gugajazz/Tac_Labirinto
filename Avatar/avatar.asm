@@ -19,6 +19,7 @@ dseg	segment para public 'data'
 
 		STR12	 		DB 		"            "	; String para 12 digitos
 		DDMMAAAA 		db		"                     "
+		Teste			DB		"AAA$"
 		
 		Horas			dw		0				; Vai guardar a HORA actual
 		Minutos			dw		0				; Vai guardar os minutos actuais
@@ -214,8 +215,10 @@ CICLO:		goto_xy	POSxa,POSya		; Vai para a posi��o anterior do cursor
 			xor si, si
 			xor di, di
 
+jmp IMPRIME_TEMPO ;TESTING
+
 VERIFICA_REP:	mov ah, Construir_nome[di]
-				cmp ah, '$'
+				cmp ah, '$' ;sets zero flag se ah == $
 				je 	VERIFICA
 				cmp	Car, ah		
 				je	IMPRIME
@@ -306,6 +309,18 @@ IMPRIME_GAME:	mov al, Car
 				lea dx, Construir_nome
 				int 21h
 				jmp IMPRIME
+
+IMPRIME_TEMPO:	goto_xy 60,0 ;primeiro num=x segundo num=y
+				mov ah, 09h
+				lea dx, String_TJ ;string acabada em $ que queremos imprimir
+				int 21h
+				
+				goto_xy 55,0 ;primeiro num=x segundo num=y
+				mov ah, 09h
+				lea dx, Tempo_j ;string acabada em $ que queremos imprimir
+				int 21h
+				jmp IMPRIME
+
 fim:				
 			RET
 AVATAR		endp
