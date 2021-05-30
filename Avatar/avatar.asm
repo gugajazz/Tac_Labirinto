@@ -19,7 +19,7 @@ dseg	segment para public 'data'
 
 		STR12	 		DB 		"            "	; String para 12 digitos
 		DDMMAAAA 		db		"                     "
-		Teste			DB		"AAA$"
+		numstr 			db 		'$$$$$'     	;STRING FOR 4 DIGITS.
 		
 		Horas			dw		0				; Vai guardar a HORA actual
 		Minutos			dw		0				; Vai guardar os minutos actuais
@@ -28,7 +28,7 @@ dseg	segment para public 'data'
 		Tempo_init		dw		0				; Guarda O Tempo de inicio do jogo
 		Tempo_j			dw		0				; Guarda O Tempo que decorre o  jogo
 		Tempo_limite	dw		100				; tempo m�ximo de Jogo
-		String_TJ		db		"    /100$"
+		String_TJ		db		"/100$"
 
 		String_num 		db 		"  0 $"
         String_nome  	db	    "ISEC$"	
@@ -169,7 +169,30 @@ LE_TECLA	PROC
 SAI_TECLA:	RET
 LE_TECLA	endp
 
+;########################################################################
+; number to string	
 
+number2string proc 
+  ;call dollars ;FILL STRING WITH $.
+  mov  bx, 10  ;DIGITS ARE EXTRACTED DIVIDING BY 10.
+  mov  cx, 0   ;COUNTER FOR EXTRACTED DIGITS.
+cycle1:       
+  mov  dx, 0   ;NECESSARY TO DIVIDE BY BX.
+  div  bx      ;DX:AX / 10 = AX:QUOTIENT DX:REMAINDER.
+  push dx      ;PRESERVE DIGIT EXTRACTED FOR LATER.
+  inc  cx      ;INCREASE COUNTER FOR EVERY DIGIT EXTRACTED.
+  cmp  ax, 0   ;IF NUMBER IS
+  jne  cycle1  ;NOT ZERO, LOOP. 
+;NOW RETRIEVE PUSHED DIGITS.
+cycle2:  
+  pop  dx        
+  add  dl, 48  ;CONVERT DIGIT TO CHARACTER.
+  mov  [ si ], dl
+  inc  si
+  loop cycle2  
+
+  ret
+number2string endp
 
 ;########################################################################
 ; Avatar
@@ -214,8 +237,13 @@ CICLO:		goto_xy	POSxa,POSya		; Vai para a posi��o anterior do cursor
 			goto_xy	POSx,POSy		; Vai para posi��o do cursor
 			xor si, si
 			xor di, di
+;»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»»
+mov  si, offset numstr
+mov  ax, Tempo_j
+call number2string    ;RETURNS NUMSTR.
 
 jmp IMPRIME_TEMPO ;TESTING
+;««««««««««««««««««««««««««««««««««««««««««««««
 
 VERIFICA_REP:	mov ah, Construir_nome[di]
 				cmp ah, '$' ;sets zero flag se ah == $
@@ -310,15 +338,15 @@ IMPRIME_GAME:	mov al, Car
 				int 21h
 				jmp IMPRIME
 
-IMPRIME_TEMPO:	goto_xy 60,0 ;primeiro num=x segundo num=y
+IMPRIME_TEMPO:	goto_xy 59,0 ;primeiro num=x segundo num=y
 				mov ah, 09h
 				lea dx, String_TJ ;string acabada em $ que queremos imprimir
 				int 21h
 				
-				goto_xy 55,0 ;primeiro num=x segundo num=y
-				mov ah, 09h
-				lea dx, Tempo_j ;string acabada em $ que queremos imprimir
-				int 21h
+				goto_xy 58,0 ;primeiro num=x segundo num=y
+				mov  ah, 9
+         		mov  dx, offset numstr
+         		int 21h 
 				jmp IMPRIME
 
 fim:				
