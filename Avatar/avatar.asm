@@ -216,7 +216,7 @@ CICLO:		goto_xy	POSxa,POSya		; Vai para a posi��o anterior do cursor
 			xor si, si
 			xor bx, bx
 
-			VERIFICA_REP:	mov ah, Construir_nome[bx]
+VERIFICA_REP:	mov ah, Construir_nome[bx]
 				cmp ah, '$'
 				je 	VERIFICA
 				cmp	Car, ah		
