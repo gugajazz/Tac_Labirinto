@@ -20,7 +20,7 @@ PILHA	ENDS
 
 dseg	segment para public 'data'
 
-		numstr 			db 		'$$$$'     	;STRING FOR 4 DIGITS.
+
 		STR12	 		DB 		"            "	; String para 12 digitos
 		DDMMAAAA 		db		"                     "
 		NUMERO			DB		"                    $" 	; String destinada a guardar o número lido
@@ -34,7 +34,7 @@ dseg	segment para public 'data'
 		Tempo_init		dw		0				; Guarda O Tempo de inicio do jogo
 		Tempo_j			dw		0				; Guarda O Tempo que decorre o  jogo
 		Tempo_limite	dw		100				; tempo m�ximo de Jogo
-		String_TJ		db		" /100$"
+		String_TJ		db		"  /100$"
 
 		String_num 		db 		"  0 $"
         String_nome  	db	    "ISEC$"	
@@ -63,7 +63,6 @@ dseg	ends
 
 cseg	segment para public 'code'
 assume		cs:cseg, ds:dseg
-
 
 ;********************************************************************************
 ;********************************************************************************
@@ -395,60 +394,13 @@ sai_f:
 IMP_FICH	endp		
 
 
-number2string proc 
-  ;call dollars ;FILL STRING WITH $.
-  mov  bx, 10  ;DIGITS ARE EXTRACTED DIVIDING BY 10.
-  mov  cx, 0   ;COUNTER FOR EXTRACTED DIGITS.
-cycle1:       
-  mov  dx, 0   ;NECESSARY TO DIVIDE BY BX.
-  div  bx      ;DX:AX / 10 = AX:QUOTIENT DX:REMAINDER.
-  push dx      ;PRESERVE DIGIT EXTRACTED FOR LATER.
-  inc  cx      ;INCREASE COUNTER FOR EVERY DIGIT EXTRACTED.
-  cmp  ax, 0   ;IF NUMBER IS
-  jne  cycle1  ;NOT ZERO, LOOP. 
-;NOW RETRIEVE PUSHED DIGITS.
-cycle2:  
-  pop  dx        
-  add  dl, 48  ;CONVERT DIGIT TO CHARACTER.
-  mov  [ si ], dl
-  inc  si
-  loop cycle2  
-
-  ret
-number2string endp
-
-
 ;########################################################################
 ; LE UMA TECLA	
 
-
-
 LE_TECLA	PROC
-		sem_tecla:
+
+sem_tecla:
 		call Trata_Horas
-
-
-
-		
-		
-		
-		goto_xy 58,0 ;primeiro num=x segundo num=y
-		mov  ah, 9
-		mov  dx, offset numstr
-		int 21h 
-
-		CALL 	Ler_TEMPO				; Horas MINUTOS e segundos do Sistema
-
-		MOV		AX, Segundos
-		cmp		AX, Old_seg			; VErifica se os segundos mudaram desde a ultima leitura
-		je		continuar			; Se a hora não mudou desde a última leitura sai.
-		;mov		Old_seg, AX			; Se segundos são diferentes actualiza informação do tempo 
-		ADD Tempo_j, 1
-		mov  si, offset numstr
-		mov  ax, Tempo_j
-		call number2string    ;RETURNS NUMSTR.
-
-		continuar:
 		MOV AH, 0BH
 		INT 21h
 		CMP AL,0
@@ -471,11 +423,6 @@ LE_TECLA	endp
 ; Avatar
 
 AVATAR	PROC
-			goto_xy 59,0 ;primeiro num=x segundo num=y
-			mov ah, 09h
-			lea dx, String_TJ ;string acabada em $ que queremos imprimir
-			int 21h 			;imprime o /100
-
 			mov		ax,0B800h
 			mov		es,ax
 
