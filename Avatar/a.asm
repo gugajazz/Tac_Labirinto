@@ -34,7 +34,7 @@ dseg	segment para public 'data'
 		Tempo_init		dw		0				; Guarda O Tempo de inicio do jogo
 		Tempo_j			dw		0				; Guarda O Tempo que decorre o  jogo
 		Tempo_limite	dw		100				; tempo m�ximo de Jogo
-		String_TJ		db		"    /100$"
+		String_TJ		db		"  /100$"
 
 		String_num 		db 		"  0 $"
         String_nome  	db	    "ISEC$"	
@@ -270,7 +270,18 @@ Trata_Horas PROC
 		MOV 	STR12[2],'s'		
 		MOV 	STR12[3],'$'
 		GOTO_XY	10,0
-		MOSTRA	STR12 		
+		MOSTRA	STR12 
+
+		mov 	ax, Tempo_j			; Contador
+		inc 	Tempo_j
+		MOV 	bl, 10     
+		div 	bl
+		add 	al, 30h				; Caracter Correspondente às dezenas
+		add		ah,	30h				; Caracter Correspondente às unidades
+		MOV 	String_TJ[0],al			; 
+		MOV 	String_TJ[1],ah		
+		goto_xy	58,0
+		MOSTRA	String_TJ		
         
 		CALL 	HOJE				; Data de HOJE
 		MOV 	al ,DDMMAAAA[0]	
@@ -426,9 +437,8 @@ AVATAR	PROC
 
 IMPRIME_PALAVRA:	;imprime a palavra q temos de procurar
 					goto_xy 10,20
-					lea dx, String_nome
-					mov ah, 09h
-					int 21h
+					MOSTRA 	String_nome
+					
 					
 ;trata:
 ;call Trata_Horas
@@ -535,9 +545,7 @@ IMPRIME_GAME:
 				mov al, Car
 				mov Construir_nome[si], al
 				goto_xy 10,21
-				mov ah, 09h	
-				lea dx, Construir_nome
-				int 21h
+				MOSTRA Construir_nome
 				inc si
 				jmp VERIFICA
 				;jmp trata
