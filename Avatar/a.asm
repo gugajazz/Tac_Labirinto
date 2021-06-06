@@ -43,7 +43,9 @@ dseg	segment para public 'data'
 		indice_nome		dw		0	; indice que aponta para Construir_nome
 		
 		Fim_Ganhou		db	    " Ganhou $"	
-		Fim_Perdeu		db	    " Perdeu $"	
+		Fim_Perdeu		db	    " Perdeu $"
+		Fim_Nivel		db	    " Passou de nivel $"	
+		Proximo_Nivel	db	    " Prima uma tecla para avancar para o proximo nivel $"	
 
         Erro_Open       db      'Erro ao tentar abrir o ficheiro$'
         Erro_Ler_Msg    db      'Erro ao tentar ler do ficheiro$'
@@ -305,7 +307,7 @@ Trata_Horas PROC
 		MOV 	al ,DDMMAAAA[9]	
 		MOV 	STR12[9], al		
 		MOV 	STR12[10],'$'
-		GOTO_XY	68,0
+		GOTO_XY	67,0
 		MOSTRA	STR12 	
 		
 						
@@ -546,12 +548,41 @@ IMPRIME_GAME:
 				mov Construir_nome[si], al
 				goto_xy 10,21
 				MOSTRA Construir_nome
-				inc si
+				inc  si
+				call WIN
 				jmp VERIFICA
 				;jmp trata
 fim:				
 			RET
 AVATAR		endp
+
+WIN	PROC
+
+	xor di, di
+
+VERIFICA_WIN:	cmp Construir_nome[di], '$'
+				je 	PROX_NIVEL
+				cmp Construir_nome[di], '_'
+				je	FIM
+				inc di
+				jmp VERIFICA_WIN
+
+
+PROX_NIVEL:	call apaga_ecran
+
+			goto_xy 31,10
+			MOSTRA Fim_Nivel
+			goto_xy 15,12
+			MOSTRA Proximo_Nivel
+AVANCAR:	mov		ah,08h
+			int		21h      
+			cmp		al, 0
+			jne		FIM
+			jmp		AVANCAR
+FIM:
+		RET
+WIN	endp
+
 
 
 ;########################################################################
