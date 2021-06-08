@@ -422,6 +422,9 @@ sem_tecla:
 		mov		ah, 08h
 		int		21h
 		mov		ah,1
+		call WIN
+		
+
 SAI_TECLA:	RET
 LE_TECLA	endp
 
@@ -438,32 +441,32 @@ MENU	PROC
 	MOSTRA 	Sair
 
 
-AVANCAR:	mov		ah,08h
-			int		21h      
-			cmp		al, 0
-			je		AVANCAR
-			cmp 	al, '1'
-			je		SAI_MENU
-			cmp 	al,	'2'
-			je		ERROTOP10
-			cmp		al, '3'
-			je 		FIM
-			jmp		AVANCAR
-
-
-ERROTOP10: 		call	apaga_ecran
-				goto_xy 27,8
-				MOSTRA Erro
-				mov		ah,08h
+	AVANCAR:	mov		ah,08h
 				int		21h      
 				cmp		al, 0
+				je		AVANCAR
+				cmp 	al, '1'
+				je		SAI_MENU
+				cmp 	al,	'2'
 				je		ERROTOP10
-				call	apaga_ecran
-				jmp		MENU
+				cmp		al, '3'
+				je 		FIM
+				jmp		AVANCAR
 
 
-FIM:	mov			ah,4CH
-		INT			21H
+	ERROTOP10: 		call	apaga_ecran
+					goto_xy 27,8
+					MOSTRA Erro
+					mov		ah,08h
+					int		21h      
+					cmp		al, 0
+					je		ERROTOP10
+					call	apaga_ecran
+					jmp		MENU
+
+
+	FIM:	mov			ah,4CH
+			INT			21H
 
 SAI_MENU:	RET
 MENU	endp
@@ -473,162 +476,171 @@ MENU	endp
 ; Avatar
 
 AVATAR	PROC
-			mov		ax,0B800h
-			mov		es,ax
+	mov		ax,0B800h
+	mov		es,ax
 
 
-			goto_xy	POSx,POSy		; Vai para nova possi��o
-			mov 	ah, 08h		; Guarda o Caracter que est� na posi��o do Cursor
-			mov		bh,0			; numero da p�gina
-			int		10h			
-			mov		Car, al			; Guarda o Caracter que est� na posi��o do Cursor
-			mov		Cor, ah			; Guarda a cor que est� na posi��o do Cursor	
-	
+	goto_xy	POSx,POSy		; Vai para nova possi��o
+	mov 	ah, 08h		; Guarda o Caracter que est� na posi��o do Cursor
+	mov		bh,0			; numero da p�gina
+	int		10h			
+	mov		Car, al			; Guarda o Caracter que est� na posi��o do Cursor
+	mov		Cor, ah			; Guarda a cor que est� na posi��o do Cursor	
 
-IMPRIME_PALAVRA:	;imprime a palavra q temos de procurar
-					goto_xy 10,20
-					MOSTRA 	String_nome
-					
-					
-;trata:
-;call Trata_Horas
 
-CICLO:		
-			goto_xy	POSxa,POSya		; Vai para a posi��o anterior do cursor
-			mov		ah, 02h
-			mov		dl, Car			; Repoe Caracter guardado 
-			int		21H		; Repoe o Caracte onde o boneco esteve p impedir um rasto	; write character to standard output | DL = character to write | after execution AL = DL
-		
-			goto_xy	POSx,POSy		; Vai para nova possi��o
-			mov 	ah, 08h
-			mov		bh,0			; numero da p�gina
-			int		10h		;guarda o caracter onde o boneco pisa		; read character and attribute at cursor position | BH = page number | return: AH = attribute AL = character.
-			mov		Car, al			; Guarda o Caracter que est� na posi��o do Cursor
-			mov		Cor, ah			; Guarda a cor que est� na posi��o do Cursor
-		
-			goto_xy	78,0			; Mostra o caractr que estava na posi��o do AVATAR
-			mov		ah, 02h			; IMPRIME caracter da posi��o no canto
-			mov		dl, Car	
-			int		21H			    ; write character to standard output | DL = character to write | after execution AL = DL
-	
-			goto_xy	POSx,POSy		; Vai para posi��o do cursor
-			xor si, si
+	IMPRIME_PALAVRA:	;imprime a palavra q temos de procurar
+						goto_xy 10,20
+						MOSTRA 	String_nome
+						
+						
+	;trata:
+	;call Trata_Horas
+
+	CICLO:		
+				goto_xy	POSxa,POSya		; Vai para a posi��o anterior do cursor
+				mov		ah, 02h
+				mov		dl, Car			; Repoe Caracter guardado 
+				int		21H		; Repoe o Caracte onde o boneco esteve p impedir um rasto	; write character to standard output | DL = character to write | after execution AL = DL
+
+				goto_xy	POSx,POSy		; Vai para nova possi��o
+				mov 	ah, 08h
+				mov		bh,0			; numero da p�gina
+				int		10h		;guarda o caracter onde o boneco pisa		; read character and attribute at cursor position | BH = page number | return: AH = attribute AL = character.
+				mov		Car, al			; Guarda o Caracter que est� na posi��o do Cursor
+				mov		Cor, ah			; Guarda a cor que est� na posi��o do Cursor
 			
-
-VERIFICA:	mov ah, String_nome[si]
-			cmp ah, '$'
-			je 	IMPRIME
-			cmp	Car, ah		
-			je	IMPRIME_GAME
-			inc si
-			jmp VERIFICA
-
-IMPRIME:	goto_xy	POSx,POSy
-			mov		ah, 02h
-			mov		dl, 190	; Coloca AVATAR, sem isto avatar n aparece
-			int		21H	
-			goto_xy	POSx,POSy	; Vai para posi��o do cursor
+				goto_xy	78,0			; Mostra o caractr que estava na posi��o do AVATAR
+				mov		ah, 02h			; IMPRIME caracter da posi��o no canto
+				mov		dl, Car	
+				int		21H			    ; write character to standard output | DL = character to write | after execution AL = DL
 		
-			mov		al, POSx	; Guarda a posi��o do cursor
-			mov		POSxa, al
-			mov		al, POSy	; Guarda a posi��o do cursor
-			mov 	POSya, al
-		
-LER_SETA:	call 	LE_TECLA
-			cmp		ah, 1
-			je		ESTEND
-			CMP 	AL, 27	 ; ESCAPE  | subtract second from first for flags 
-			JE		FIM      ;jump if zero
-			jmp		LER_SETA
-		
-ESTEND:		cmp 	al,48h
-			jne		BAIXO
-			dec		POSy		;cima
-			goto_xy	POSx,POSy			
-			mov		ah, 08h
-			mov 	bh, 0
-			int 	10h
-			cmp 	al, 177
-			jne 	CICLO  
-			inc		POSy
-			jmp		CICLO
+				goto_xy	POSx,POSy		; Vai para posi��o do cursor
+				xor si, si
 
-BAIXO:		cmp		al,50h
-			jne		ESQUERDA
-			inc 	POSy		;Baixo
-			goto_xy	POSx,POSy			
-			mov		ah, 08h
-			mov 	bh, 0
-			int 	10h
-			cmp 	al, 177
-			jne 	CICLO  
-			dec		POSy		
-			jmp 	CICLO
 
-ESQUERDA:
-			cmp		al,4Bh
-			jne		DIREITA
-			dec		POSx		;Esquerda
-			goto_xy	POSx,POSy			
-			mov		ah, 08h
-			mov 	bh, 0
-			int 	10h
-			cmp 	al, 177
-			jne 	CICLO  
-			inc		POSx
-			jmp		CICLO
-
-DIREITA:
-			cmp		al,4Dh
-			jne		LER_SETA 
-			inc		POSx		;Direita
-			goto_xy	POSx,POSy			
-			mov		ah, 08h
-			mov 	bh, 0
-			int 	10h
-			cmp 	al, 177
-			jne 	CICLO  
-			dec		POSx
-			jmp		CICLO
-
-IMPRIME_GAME:	
-				mov al, Car
-				mov Construir_nome[si], al
-				goto_xy 10,21
-				MOSTRA Construir_nome
-				inc  si
-				call WIN
+	VERIFICA:	mov ah, String_nome[si]
+				cmp ah, '$'
+				je 	IMPRIME
+				cmp	Car, ah		
+				je	IMPRIME_GAME
+				inc si
 				jmp VERIFICA
-				;jmp trata
-fim:				
-			RET
+
+	IMPRIME:	goto_xy	POSx,POSy
+				mov		ah, 02h
+				mov		dl, 190	; Coloca AVATAR, sem isto avatar n aparece
+				int		21H	
+				goto_xy	POSx,POSy	; Vai para posi��o do cursor
+			
+				mov		al, POSx	; Guarda a posi��o do cursor
+				mov		POSxa, al
+				mov		al, POSy	; Guarda a posi��o do cursor
+				mov 	POSya, al
+			
+	LER_SETA:	call 	LE_TECLA 
+				cmp		ah, 1
+				je		ESTEND
+				CMP 	AL, 27	 ; ESCAPE  | subtract second from first for flags 
+				JE		FIM      ;jump if zero
+				jmp		LER_SETA
+			
+	ESTEND:		cmp 	al,48h
+				jne		BAIXO
+				dec		POSy		;cima
+				goto_xy	POSx,POSy			
+				mov		ah, 08h
+				mov 	bh, 0
+				int 	10h
+				cmp 	al, 177
+				jne 	CICLO  
+				inc		POSy
+				jmp		CICLO
+
+	BAIXO:		cmp		al,50h
+				jne		ESQUERDA
+				inc 	POSy		;Baixo
+				goto_xy	POSx,POSy			
+				mov		ah, 08h
+				mov 	bh, 0
+				int 	10h
+				cmp 	al, 177
+				jne 	CICLO  
+				dec		POSy		
+				jmp 	CICLO
+
+	ESQUERDA:
+				cmp		al,4Bh
+				jne		DIREITA
+				dec		POSx		;Esquerda
+				goto_xy	POSx,POSy			
+				mov		ah, 08h
+				mov 	bh, 0
+				int 	10h
+				cmp 	al, 177
+				jne 	CICLO  
+				inc		POSx
+				jmp		CICLO
+
+	DIREITA:
+				cmp		al,4Dh
+				jne		LER_SETA 
+				inc		POSx		;Direita
+				goto_xy	POSx,POSy			
+				mov		ah, 08h
+				mov 	bh, 0
+				int 	10h
+				cmp 	al, 177
+				jne 	CICLO  
+				dec		POSx
+				jmp		CICLO
+
+	IMPRIME_GAME:	
+					mov al, Car
+					mov Construir_nome[si], al
+					goto_xy 10,21
+					MOSTRA Construir_nome
+					inc  si
+					;call WIN
+					jmp VERIFICA
+					;jmp trata
+	fim:				
+				RET
 AVATAR		endp
 
 WIN	PROC
 
 	xor di, di
 
-VERIFICA_WIN:	cmp Construir_nome[di], '$'
-				je 	PROX_NIVEL
-				cmp Construir_nome[di], '_'
-				je	FIM
-				inc di
-				jmp VERIFICA_WIN
+	VERIFICA_WIN:	cmp Construir_nome[di], '$'
+					je 	PROX_NIVEL
+					cmp Construir_nome[di], '_'
+					je	FIM
+					inc di
+					jmp VERIFICA_WIN
 
+	PROX_NIVEL:	call apaga_ecran
+				goto_xy 31,10
+				MOSTRA Fim_Nivel
+				goto_xy 15,12
+				MOSTRA Proximo_Nivel
 
-PROX_NIVEL:	call apaga_ecran
+	AVANCAR:	mov		ah,08h
+				int		21h      
+				cmp		al, 0
+				;jne		FIM
+				jne 	SAI_PARA_MENU
+				jmp		AVANCAR
+	FIM:
+			RET
 
-			goto_xy 31,10
-			MOSTRA Fim_Nivel
-			goto_xy 15,12
-			MOSTRA Proximo_Nivel
-AVANCAR:	mov		ah,08h
-			int		21h      
-			cmp		al, 0
-			jne		FIM
-			jmp		AVANCAR
-FIM:
-		RET
+	SAI_PARA_MENU: ;sai do loop e vai para o menu
+		mov Construir_nome[0], "_"
+		mov Construir_nome[1], "_"
+		mov Construir_nome[2], "_"
+		mov Construir_nome[3], "_" 
+		mov Tempo_j, 0
+		
+				
 WIN	endp
 
 
@@ -643,13 +655,13 @@ Main  proc
 		
 		
 		call		apaga_ecran
-		call		MENU
+		call		MENU    ;chama o menu
 		call		apaga_ecran
 		goto_xy		0,0
 		call		IMP_FICH  ;abrir o ficheiro acho
 		call 		AVATAR 
    
-		goto_xy		0,22		;macro para mexer o boneco acho
+		goto_xy		0,22
 		
 		mov			ah,4CH
 		INT			21H     ;return control to the operating system (stop program)
