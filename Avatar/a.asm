@@ -47,6 +47,12 @@ dseg	segment para public 'data'
 		Fim_Nivel		db	    " Passou de nivel $"	
 		Proximo_Nivel	db	    " Prima uma tecla para avancar para o proximo nivel $"	
 
+		Jogar			db	    " (1)Jogar $"
+		Top10			db	    " (2)Top 10 $"
+		Sair			db	    " (3)Sair $"
+
+		Erro			db      'Top 10 nao implementado $'
+
         Erro_Open       db      'Erro ao tentar abrir o ficheiro$'
         Erro_Ler_Msg    db      'Erro ao tentar ler do ficheiro$'
         Erro_Close      db      'Erro ao tentar fechar o ficheiro$'
@@ -54,7 +60,7 @@ dseg	segment para public 'data'
         HandleFich      dw      0
         car_fich        db      ?
 
-		string			db	"Teste pr�tico de T.I",0
+		string			db	"Teste pratico de T.I $"
 		Car				db	32	; Guarda um caracter do Ecran 
 		Cor				db	7	; Guarda os atributos de cor do caracter
 		POSy			db	3	; a linha pode ir de [1 .. 25]
@@ -420,6 +426,48 @@ SAI_TECLA:	RET
 LE_TECLA	endp
 
 
+MENU	PROC
+
+	goto_xy 27,8
+	MOSTRA 	string
+	goto_xy 31,10
+	MOSTRA 	Jogar
+	goto_xy 31,11
+	MOSTRA 	Top10
+	goto_xy 31,12
+	MOSTRA 	Sair
+
+
+AVANCAR:	mov		ah,08h
+			int		21h      
+			cmp		al, 0
+			je		AVANCAR
+			cmp 	al, '1'
+			je		SAI_MENU
+			cmp 	al,	'2'
+			je		ERROTOP10
+			cmp		al, '3'
+			je 		FIM
+			jmp		AVANCAR
+
+
+ERROTOP10: 		call	apaga_ecran
+				goto_xy 27,8
+				MOSTRA Erro
+				mov		ah,08h
+				int		21h      
+				cmp		al, 0
+				je		ERROTOP10
+				call	apaga_ecran
+				jmp		MENU
+
+
+FIM:	mov			ah,4CH
+		INT			21H
+
+SAI_MENU:	RET
+MENU	endp
+
 
 ;########################################################################
 ; Avatar
@@ -593,6 +641,9 @@ Main  proc
 		mov			ax,0B800h
 		mov			es,ax
 		
+		
+		call		apaga_ecran
+		call		MENU
 		call		apaga_ecran
 		goto_xy		0,0
 		call		IMP_FICH  ;abrir o ficheiro acho
