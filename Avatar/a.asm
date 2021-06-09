@@ -39,11 +39,14 @@ dseg	segment para public 'data'
 		Nivel_str		db      " $"
 		Teste			db 		"F$"
 
+		keep			db 		0
+
 		String_num 		db 		"  0 $"
         String_nome  	db	    "ISEC$"	
 		Construir_nome	db	    "____$"
 		Dim_nome		dw		5	; Comprimento do Nome
 		indice_nome		dw		0	; indice que aponta para Construir_nome
+
 		
 		Fim_Ganhou		db	    " Ganhou $"	
 		Fim_Perdeu		db	    " Perdeu $"
@@ -486,8 +489,7 @@ MENU	PROC
 	FIM:	mov			ah,4CH
 			INT			21H
 
-SAI_MENU:	
-		
+SAI_MENU:
 		RET
 
 MENU	endp
@@ -497,6 +499,9 @@ MENU	endp
 ; Avatar
 
 AVATAR	PROC
+
+	mov keep, 0
+
 	mov		ax,0B800h
 	mov		es,ax
 
@@ -521,6 +526,11 @@ AVATAR	PROC
 				mov		dl, Car			; Repoe Caracter guardado 
 				int		21H		; Repoe o Caracte onde o boneco esteve p impedir um rasto	; write character to standard output | DL = character to write | after execution AL = DL
 
+				goto_xy 3, 3
+				mov		ah, 02h
+				mov		dl, " "			; Repoe Caracter guardado 
+				int		21H
+
 				goto_xy	POSx,POSy		; Vai para nova posicao
 				mov 	ah, 08h
 				mov		bh,0			; numero da pagina
@@ -539,7 +549,10 @@ AVATAR	PROC
 				
 
 
-	VERIFICA:	mov ah, String_nome[si]
+	VERIFICA:	cmp keep, 1 ;se keep = 1 sai para o main
+				je FIM
+
+				mov ah, String_nome[si]
 				cmp ah, '$'
 				je 	IMPRIME ;se acabou
 				cmp	Car, ah		
@@ -559,7 +572,11 @@ AVATAR	PROC
 				mov 	POSya, al
 			
 	LER_SETA:	call 	LE_TECLA 
+
 				call WIN
+				;cmp keep, 1
+				;je FIM
+
 				cmp		ah, 1
 				je		ESTEND
 				CMP 	AL, 27	 ; ESCAPE  | subtract second from first for flags 
@@ -578,7 +595,8 @@ AVATAR	PROC
 				inc		POSy
 				jmp		CICLO
 
-	BAIXO:		cmp		al,50h
+	BAIXO:		
+				cmp		al,50h
 				jne		ESQUERDA
 				inc 	POSy		;Baixo
 				goto_xy	POSx,POSy			
@@ -663,16 +681,15 @@ WIN	PROC
 		mov Tempo_j, 0
 		inc Nivel
 
-		;goto_xy 0,0
-		;MOSTRA TESTE
-
 		mov POSy, 3
-		mov POSx, 3
+		mov POSx, 3 
 
-		;ret
+		mov keep, 1
+
+		;ret 
+
 						
 WIN	endp
-
 
 
 ;########################################################################
@@ -683,18 +700,33 @@ Main  proc
 		mov			ax,0B800h
 		mov			es,ax
 		
-		
 		call		apaga_ecran
 		call		MENU    	;chama o menu
 		call		apaga_ecran
 		goto_xy		0,0
-		call		IMP_FICH  ;abrir o ficheiro acho
+		call		IMP_FICH  ;abrir o ficheiro
+
+		cmp keep, 1
+		je ultimo_caracter
+
+		voltar_avatar:
 		call 		AVATAR 
-   
+
+    
 		goto_xy		0,22 ;para o path ficar no fundo da consola quando clicamos esc
 		
 		mov			ah,4CH
 		INT			21H     ;return control to the operating system (stop program)
+
+		ultimo_caracter:
+			goto_xy POSy, POSx
+			mov		ah, 02h
+			mov		dl, Car			; Repoe Caracter guardado 
+			int		21H
+			jmp voltar_avatar
+
+
+
 Main	endp
 Cseg	ends
 end	Main
