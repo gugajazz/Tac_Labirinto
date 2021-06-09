@@ -33,7 +33,7 @@ dseg	segment para public 'data'
 		Old_seg			dw		0				; Guarda os �ltimos segundos que foram lidos
 		Tempo_init		dw		0				; Guarda O Tempo de inicio do jogo
 		Tempo_j			dw		0				; Guarda O Tempo que decorre o  jogo
-		Tempo_limite	dw		100				; tempo m�ximo de Jogo
+		Tempo_limite	dw		101				; tempo m�ximo de Jogo
 		String_TJ		db		"  /100$"
 		Nivel			dw		49				;48 ascii = 0 | 49 = 1 | 50 = 2 ....
 		Nivel_str		db      " $"
@@ -49,10 +49,13 @@ dseg	segment para public 'data'
 
 		
 		Fim_Ganhou		db	    " Ganhou $"	
-		Fim_Perdeu		db	    " Perdeu $"
+		Fim_Perdeu		db	    " Perdeu o jogo $"
+		Fim_Reiniciar	db		" Quer reiniciar o jogo? $"
+		Fim_Escolha		db		" (1)Sim	(2)Nao $"
 		Fim_Nivel		db	    " Passou de nivel $"	
 		Proximo_Nivel	db	    " Prima uma tecla para avancar para o proximo nivel $"	
 		Nivel_atual		db	    " Esta no nivel $"
+
 
 		Jogar			db	    " (1)Jogar $"
 		Top10			db	    " (2)Top 10 $"
@@ -297,6 +300,7 @@ Trata_Horas PROC
 		MOV 	String_TJ[1],ah		
 		goto_xy	58,0
 		MOSTRA	String_TJ		
+		call	VERIFICA_DERROTA
         
 		CALL 	HOJE				; Data de HOJE
 		MOV 	al ,DDMMAAAA[0]	
@@ -647,6 +651,48 @@ AVATAR	PROC
 				RET
 AVATAR		endp
 
+VERIFICA_DERROTA	PROC
+
+	mov 	ax, Tempo_limite
+	cmp 	Tempo_j, ax
+	je		DERROTA
+	RET
+
+	DERROTA:	call 	apaga_ecran
+				goto_xy 31, 10
+				MOSTRA 	Fim_Perdeu
+				goto_xy 27, 11
+				MOSTRA 	Fim_Reiniciar
+				goto_xy 30, 13
+				MOSTRA 	Fim_Escolha
+				mov		ah,08h
+				int		21h      
+				cmp		al, '0'
+				je		DERROTA
+				cmp		al, '2'
+				je		FIM
+				cmp		al, '1'
+				je		SAI_MENU
+				jmp		DERROTA
+
+	SAI_MENU:
+				mov 	Construir_nome[0], "_"
+				mov 	Construir_nome[1], "_"
+				mov 	Construir_nome[2], "_"
+				mov 	Construir_nome[3], "_" 
+				mov 	Tempo_j, 0
+				mov 	POSy, 3
+				mov		Nivel, 49
+				mov 	POSx, 3 
+				mov 	keep, 1
+				call 	Main
+
+	FIM: 	mov		ah,4ch
+			int		21h  
+
+	
+VERIFICA_DERROTA	endp
+
 WIN	PROC
 
 	xor di, di
@@ -690,6 +736,7 @@ WIN	PROC
 
 						
 WIN	endp
+
 
 
 ;########################################################################
