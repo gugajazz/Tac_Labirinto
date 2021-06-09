@@ -444,13 +444,15 @@ MENU	PROC
 	mov Nivel_str[0], CL
 	MOSTRA 	Nivel_str
 
-
 	goto_xy 31,12
 	MOSTRA 	Jogar
 	goto_xy 31,13
 	MOSTRA 	Top10
 	goto_xy 31,14
 	MOSTRA 	Sair
+
+	mov POSy, 3
+	mov POSx, 3
 
 
 	AVANCAR:	mov		ah,08h
@@ -652,8 +654,7 @@ WIN	PROC
 		mov Construir_nome[3], "_" 
 		mov Tempo_j, 0
 		inc Nivel
-		
-				
+						
 WIN	endp
 
 
