@@ -35,9 +35,6 @@ dseg	segment para public 'data'
 		Tempo_j			dw		0				; Guarda O Tempo que decorre o  jogo
 		Tempo_limite	dw		100				; tempo m�ximo de Jogo
 		String_TJ		db		"  /100$"
-		Nivel			dw		49				;48 ascii = 0 | 49 = 1 | 50 = 2 ....
-		Nivel_str		db      " $"
-		Teste			db 		"F$"
 
 		String_num 		db 		"  0 $"
         String_nome  	db	    "ISEC$"	
@@ -49,7 +46,6 @@ dseg	segment para public 'data'
 		Fim_Perdeu		db	    " Perdeu $"
 		Fim_Nivel		db	    " Passou de nivel $"	
 		Proximo_Nivel	db	    " Prima uma tecla para avancar para o proximo nivel $"	
-		Nivel_atual		db	    " Esta no nivel $"
 
 		Jogar			db	    " (1)Jogar $"
 		Top10			db	    " (2)Top 10 $"
@@ -426,7 +422,7 @@ sem_tecla:
 		mov		ah, 08h
 		int		21h
 		mov		ah,1
-		;call WIN 			;ve se ganhaste e se sim limpa o contador e as letras q ja encontraste
+		call WIN
 		
 
 SAI_TECLA:	RET
@@ -437,32 +433,18 @@ MENU	PROC
 
 	goto_xy 27,8
 	MOSTRA 	string
-
-	goto_xy 29,10
-	MOSTRA Nivel_atual
-	goto_xy 44,10
-	mov CX, Nivel ;passar o numero do nivel para a string e imprimir
-	mov Nivel_str[0], CL
-	MOSTRA 	Nivel_str
-
-	goto_xy 31,12
+	goto_xy 31,10
 	MOSTRA 	Jogar
-	goto_xy 31,13
+	goto_xy 31,11
 	MOSTRA 	Top10
-	goto_xy 31,14
+	goto_xy 31,12
 	MOSTRA 	Sair
-
-	
-
-	;mov POSy, 3 ;qnd reinicia no nivel a seguir aparece nesta posicao em vez de no sitio onde acabou o ultimo nivel
-	;mov POSx, 3
-	
 
 
 	AVANCAR:	mov		ah,08h
 				int		21h      
 				cmp		al, 0
-				je		AVANCAR ;se nao houver input continua no loop
+				je		AVANCAR
 				cmp 	al, '1'
 				je		SAI_MENU
 				cmp 	al,	'2'
@@ -486,10 +468,7 @@ MENU	PROC
 	FIM:	mov			ah,4CH
 			INT			21H
 
-SAI_MENU:	
-		
-		RET
-
+SAI_MENU:	RET
 MENU	endp
 
 
@@ -501,47 +480,47 @@ AVATAR	PROC
 	mov		es,ax
 
 
-	goto_xy	POSx,POSy		; Vai para nova possicao
-	mov 	ah, 08h		; Guarda o Caracter que esta na posicao do Cursor
-	mov		bh,0			; numero da pagina
+	goto_xy	POSx,POSy		; Vai para nova possi��o
+	mov 	ah, 08h		; Guarda o Caracter que est� na posi��o do Cursor
+	mov		bh,0			; numero da p�gina
 	int		10h			
-	mov		Car, al			; Guarda o Caracter que esta na posicao do Cursor
-	mov		Cor, ah			; Guarda a cor que esta na posicao do Cursor	
+	mov		Car, al			; Guarda o Caracter que est� na posi��o do Cursor
+	mov		Cor, ah			; Guarda a cor que est� na posi��o do Cursor	
 
 
 	IMPRIME_PALAVRA:	;imprime a palavra q temos de procurar
 						goto_xy 10,20
 						MOSTRA 	String_nome
 						
-	
+						
+	;trata:
+	;call Trata_Horas
 
 	CICLO:		
-				goto_xy	POSxa,POSya		; Vai para a posicao anterior do cursor
+				goto_xy	POSxa,POSya		; Vai para a posi��o anterior do cursor
 				mov		ah, 02h
 				mov		dl, Car			; Repoe Caracter guardado 
 				int		21H		; Repoe o Caracte onde o boneco esteve p impedir um rasto	; write character to standard output | DL = character to write | after execution AL = DL
 
-				goto_xy	POSx,POSy		; Vai para nova posicao
+				goto_xy	POSx,POSy		; Vai para nova possi��o
 				mov 	ah, 08h
-				mov		bh,0			; numero da pagina
+				mov		bh,0			; numero da p�gina
 				int		10h		;guarda o caracter onde o boneco pisa		; read character and attribute at cursor position | BH = page number | return: AH = attribute AL = character.
-				mov		Car, al			; Guarda o Caracter que esta na posicao do Cursor
-				mov		Cor, ah			; Guarda a cor que esta na posicao do Cursor
+				mov		Car, al			; Guarda o Caracter que est� na posi��o do Cursor
+				mov		Cor, ah			; Guarda a cor que est� na posi��o do Cursor
 			
-				goto_xy	78,0			; Mostra o caractr que estava na posicao do AVATAR
-				mov		ah, 02h			; IMPRIME caracter da posicao no canto
+				goto_xy	78,0			; Mostra o caractr que estava na posi��o do AVATAR
+				mov		ah, 02h			; IMPRIME caracter da posi��o no canto
 				mov		dl, Car	
 				int		21H			    ; write character to standard output | DL = character to write | after execution AL = DL
 		
-				goto_xy	POSx,POSy		; Vai para posicao do cursor
-				xor si, si				;si fica a zero
-
-				
+				goto_xy	POSx,POSy		; Vai para posi��o do cursor
+				xor si, si
 
 
 	VERIFICA:	mov ah, String_nome[si]
 				cmp ah, '$'
-				je 	IMPRIME ;se acabou
+				je 	IMPRIME
 				cmp	Car, ah		
 				je	IMPRIME_GAME
 				inc si
@@ -559,7 +538,6 @@ AVATAR	PROC
 				mov 	POSya, al
 			
 	LER_SETA:	call 	LE_TECLA 
-				call WIN
 				cmp		ah, 1
 				je		ESTEND
 				CMP 	AL, 27	 ; ESCAPE  | subtract second from first for flags 
@@ -661,16 +639,8 @@ WIN	PROC
 		mov Construir_nome[2], "_"
 		mov Construir_nome[3], "_" 
 		mov Tempo_j, 0
-		inc Nivel
-
-		;goto_xy 0,0
-		;MOSTRA TESTE
-
-		mov POSy, 3
-		mov POSx, 3
-
-		;ret
-						
+		
+				
 WIN	endp
 
 
@@ -685,13 +655,13 @@ Main  proc
 		
 		
 		call		apaga_ecran
-		call		MENU    	;chama o menu
+		call		MENU    ;chama o menu
 		call		apaga_ecran
 		goto_xy		0,0
 		call		IMP_FICH  ;abrir o ficheiro acho
 		call 		AVATAR 
    
-		goto_xy		0,22 ;para o path ficar no fundo da consola quando clicamos esc
+		goto_xy		0,22
 		
 		mov			ah,4CH
 		INT			21H     ;return control to the operating system (stop program)
