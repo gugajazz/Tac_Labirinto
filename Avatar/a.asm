@@ -35,6 +35,8 @@ dseg	segment para public 'data'
 		Tempo_j			dw		0				; Guarda O Tempo que decorre o  jogo
 		Tempo_limite	dw		100				; tempo m�ximo de Jogo
 		String_TJ		db		"  /100$"
+		Nivel			dw		48				;48 ascii = 0 | 49 = 1 | 50 = 2 ....
+		Nivel_str		db      " $"
 
 		String_num 		db 		"  0 $"
         String_nome  	db	    "ISEC$"	
@@ -46,6 +48,7 @@ dseg	segment para public 'data'
 		Fim_Perdeu		db	    " Perdeu $"
 		Fim_Nivel		db	    " Passou de nivel $"	
 		Proximo_Nivel	db	    " Prima uma tecla para avancar para o proximo nivel $"	
+		Nivel_atual		db	    " Esta no nivel $"
 
 		Jogar			db	    " (1)Jogar $"
 		Top10			db	    " (2)Top 10 $"
@@ -422,7 +425,7 @@ sem_tecla:
 		mov		ah, 08h
 		int		21h
 		mov		ah,1
-		call WIN
+		call WIN ;ve se ganhaste e se sim limpa o contador e as letras q ja encontraste
 		
 
 SAI_TECLA:	RET
@@ -433,11 +436,20 @@ MENU	PROC
 
 	goto_xy 27,8
 	MOSTRA 	string
-	goto_xy 31,10
-	MOSTRA 	Jogar
-	goto_xy 31,11
-	MOSTRA 	Top10
+
+	goto_xy 29,10
+	MOSTRA Nivel_atual
+	goto_xy 44,10
+	mov CX, Nivel ;passar o numero do nivel para a string e imprimir
+	mov Nivel_str[0], CL
+	MOSTRA 	Nivel_str
+
+
 	goto_xy 31,12
+	MOSTRA 	Jogar
+	goto_xy 31,13
+	MOSTRA 	Top10
+	goto_xy 31,14
 	MOSTRA 	Sair
 
 
@@ -639,6 +651,7 @@ WIN	PROC
 		mov Construir_nome[2], "_"
 		mov Construir_nome[3], "_" 
 		mov Tempo_j, 0
+		inc Nivel
 		
 				
 WIN	endp
