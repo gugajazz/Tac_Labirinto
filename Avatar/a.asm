@@ -42,8 +42,8 @@ dseg	segment para public 'data'
 		keep			db 		0
 
 		String_num 		db 		"  0 $"
-        String_nome  	db	    "ISEC   $"	
-		Construir_nome	db	    "____   $"
+        String_nome  	db	    "ISEC    $"	
+		Construir_nome	db	    "____    $"
 		Dim_nome		dw		5	; Comprimento do Nome
 		indice_nome		dw		0	; indice que aponta para Construir_nome
 
@@ -680,10 +680,12 @@ VERIFICA_DERROTA	PROC
 				mov 	Construir_nome[1], "_"
 				mov 	Construir_nome[2], "_"
 				mov 	Construir_nome[3], "_" 
+				mov 	Construir_nome[4], "$"
 				mov		String_nome[0], "I"
 				mov 	String_nome[1], "S"
 				mov 	String_nome[2], "E"
 				mov 	String_nome[3], "C" 
+				mov 	String_nome[4], "$" 
 				mov 	Tempo_limite, 101
 				mov 	Tempo_j, 0
 				mov 	POSy, 3
@@ -735,6 +737,12 @@ WIN	PROC
 
 		cmp	Nivel, 50
 		je	NIVEL2
+		cmp Nivel, 51
+		je NIVEL3
+		cmp Nivel, 52
+		je NIVEL4
+		cmp Nivel, 53
+		je NIVEL5
 		;ret 
 	NIVEL2:	mov Construir_nome[0], "_"
 			mov Construir_nome[1], "_"
@@ -750,8 +758,70 @@ WIN	PROC
 			mov String_TJ[4], "0"
 			mov String_TJ[5], "$"
 			mov Tempo_limite, 91
+			jmp FIM_WIN
+
+	NIVEL3:	mov Construir_nome[0], "_"
+			mov Construir_nome[1], "_"
+			mov Construir_nome[2], "_"
+			mov Construir_nome[3], "_" 
+			mov Construir_nome[4], "_"
+			mov Construir_nome[5], "_"
+			mov	String_nome[0], "M"
+			mov String_nome[1], "O"
+			mov String_nome[2], "O"
+			mov String_nome[3], "D" 
+			mov String_nome[4], "L" 
+			mov String_nome[5], "E" 
+			mov	String_TJ[3], "8"
+			mov String_TJ[4], "0"
+			mov String_TJ[5], "$"
+			mov Tempo_limite, 81
+			jmp FIM_WIN
+
+	NIVEL4:	mov Construir_nome[0], "_"
+			mov Construir_nome[1], "_"
+			mov Construir_nome[2], "_"
+			mov Construir_nome[3], "_" 
+			mov Construir_nome[4], "_"
+			mov Construir_nome[5], "_"
+			mov Construir_nome[6], "_"
+			mov	String_nome[0], "M"
+			mov String_nome[1], "E"
+			mov String_nome[2], "M"
+			mov String_nome[3], "O" 
+			mov String_nome[4], "R" 
+			mov String_nome[5], "I" 
+			mov String_nome[6], "A" 
+			mov	String_TJ[3], "7"
+			mov String_TJ[4], "0"
+			mov String_TJ[5], "$"
+			mov Tempo_limite, 71
+			jmp FIM_WIN
+
+	NIVEL5:	mov Construir_nome[0], "_"
+			mov Construir_nome[1], "_"
+			mov Construir_nome[2], "_"
+			mov Construir_nome[3], "_" 
+			mov Construir_nome[4], "_"
+			mov Construir_nome[5], "_"
+			mov Construir_nome[6], "_"
+			mov Construir_nome[7], "_"
+			mov	String_nome[0], "A"
+			mov String_nome[1], "S"
+			mov String_nome[2], "S"
+			mov String_nome[3], "E" 
+			mov String_nome[4], "M" 
+			mov String_nome[5], "B" 
+			mov String_nome[6], "L" 
+			mov String_nome[7], "Y" 
+			mov	String_TJ[3], "6"
+			mov String_TJ[4], "0"
+			mov String_TJ[5], "$"
+			mov Tempo_limite, 61
+			jmp FIM_WIN
+
 			
-			
+	FIM_WIN:
 						
 WIN	endp
 
