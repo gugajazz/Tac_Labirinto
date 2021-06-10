@@ -42,8 +42,8 @@ dseg	segment para public 'data'
 		keep			db 		0
 
 		String_num 		db 		"  0 $"
-        String_nome  	db	    "ISEC$"	
-		Construir_nome	db	    "____$"
+        String_nome  	db	    "ISEC   $"	
+		Construir_nome	db	    "____   $"
 		Dim_nome		dw		5	; Comprimento do Nome
 		indice_nome		dw		0	; indice que aponta para Construir_nome
 
@@ -680,6 +680,11 @@ VERIFICA_DERROTA	PROC
 				mov 	Construir_nome[1], "_"
 				mov 	Construir_nome[2], "_"
 				mov 	Construir_nome[3], "_" 
+				mov		String_nome[0], "I"
+				mov 	String_nome[1], "S"
+				mov 	String_nome[2], "E"
+				mov 	String_nome[3], "C" 
+				mov 	Tempo_limite, 101
 				mov 	Tempo_j, 0
 				mov 	POSy, 3
 				mov		Nivel, 49
@@ -720,20 +725,33 @@ WIN	PROC
 			RET
 
 	SAI_PARA_MENU: ;sai do loop e vai para o menu
-		mov Construir_nome[0], "_"
-		mov Construir_nome[1], "_"
-		mov Construir_nome[2], "_"
-		mov Construir_nome[3], "_" 
+
 		mov Tempo_j, 0
 		inc Nivel
 
 		mov POSy, 3
 		mov POSx, 3 
-
 		mov keep, 1
 
+		cmp	Nivel, 50
+		je	NIVEL2
 		;ret 
-
+	NIVEL2:	mov Construir_nome[0], "_"
+			mov Construir_nome[1], "_"
+			mov Construir_nome[2], "_"
+			mov Construir_nome[3], "_" 
+			mov Construir_nome[4], "_"
+			mov	String_nome[0], "C"
+			mov String_nome[1], "U"
+			mov String_nome[2], "R"
+			mov String_nome[3], "S" 
+			mov String_nome[4], "O" 
+			mov	String_TJ[3], "9"
+			mov String_TJ[4], "0"
+			mov String_TJ[5], "$"
+			mov Tempo_limite, 91
+			
+			
 						
 WIN	endp
 
