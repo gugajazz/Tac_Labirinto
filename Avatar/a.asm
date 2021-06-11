@@ -129,94 +129,94 @@ Ler_TEMPO   ENDP
 ;-------------------------------------------------------------------
 HOJE PROC	
 
-		PUSH AX
-		PUSH BX
-		PUSH CX
-		PUSH DX
-		PUSH SI
-		PUSHF
-		
-		MOV AH, 2AH             ; Buscar a data
-		INT 21H                 
-		PUSH CX                 ; Ano-> PILHA
-		XOR CX,CX              	; limpa CX
-		MOV CL, DH              ; Mes para CL
-		PUSH CX                 ; Mes-> PILHA
-		MOV CL, DL				; Dia para CL
-		PUSH CX                 ; Dia -> PILHA
-		XOR DH,DH                    
-		XOR	SI,SI
-; DIA ------------------ 
-; DX=DX/AX --- RESTO DX   
-		XOR DX,DX               ; Limpa DX
-		POP AX                  ; Tira dia da pilha
-		MOV CX, 0               ; CX = 0 
-		MOV BX, 10              ; Divisor
-		MOV	CX,2
-DD_DIV:                         
-		DIV BX                  ; Divide por 10
-		PUSH DX                 ; Resto para pilha
-		MOV DX, 0               ; Limpa resto
-		loop dd_div
-		MOV	CX,2
-DD_RESTO:
-		POP DX                  ; Resto da divisao
-		ADD DL, 30h             ; ADD 30h (2) to DL
-		MOV DDMMAAAA[SI],DL
-		INC	SI
-		LOOP DD_RESTO            
-		MOV DL, '/'             ; Separador
-		MOV DDMMAAAA[SI],DL
-		INC SI
-; MES -------------------
-; DX=DX/AX --- RESTO DX
-		MOV DX, 0               ; Limpar DX
-		POP AX                  ; Tira mes da pilha
-		XOR CX,CX               
-		MOV BX, 10				; Divisor
-		MOV CX,2
-MM_DIV:                         
-		DIV BX                  ; Divisao or 10
-		PUSH DX                 ; Resto para pilha
-		MOV DX, 0               ; Limpa resto
-		LOOP MM_DIV
-		MOV CX,2 
-MM_RESTO:
-		POP DX                  ; Resto
-		ADD DL, 30h             ; SOMA 30h
-		MOV DDMMAAAA[SI],DL
-		INC SI		
-		LOOP MM_RESTO
-		
-		MOV DL, '/'             ; Character to display goes in DL
-		MOV DDMMAAAA[SI],DL
-		INC SI
- 
-;  ANO ----------------------
-		MOV DX, 0               
-		POP AX                  ; mes para AX
-		MOV CX, 0               ; 
-		MOV BX, 10              ; 
- AA_DIV:                         
-		DIV BX                   
-		PUSH DX                 ; Guarda resto
-		ADD CX, 1               ; Soma 1 contador
-		MOV DX, 0               ; Limpa resto
-		CMP AX, 0               ; Compara quotient com zero
-		JNE AA_DIV              ; Se nao zero
-AA_RESTO:
-		POP DX                  
-		ADD DL, 30h             ; ADD 30h (2) to DL
-		MOV DDMMAAAA[SI],DL
-		INC SI
-		LOOP AA_RESTO
-		POPF
-		POP SI
-		POP DX
-		POP CX
-		POP BX
-		POP AX
- 		RET 
+			PUSH AX
+			PUSH BX
+			PUSH CX
+			PUSH DX
+			PUSH SI
+			PUSHF
+			
+			MOV AH, 2AH             ; Buscar a data
+			INT 21H                 
+			PUSH CX                 ; Ano-> PILHA
+			XOR CX,CX              	; limpa CX
+			MOV CL, DH              ; Mes para CL
+			PUSH CX                 ; Mes-> PILHA
+			MOV CL, DL				; Dia para CL
+			PUSH CX                 ; Dia -> PILHA
+			XOR DH,DH                    
+			XOR	SI,SI
+			; DIA ------------------ 
+			; DX=DX/AX --- RESTO DX   
+			XOR DX,DX               ; Limpa DX
+			POP AX                  ; Tira dia da pilha
+			MOV CX, 0               ; CX = 0 
+			MOV BX, 10              ; Divisor
+			MOV	CX,2
+	DD_DIV:                         
+			DIV BX                  ; Divide por 10
+			PUSH DX                 ; Resto para pilha
+			MOV DX, 0               ; Limpa resto
+			loop dd_div
+			MOV	CX,2
+	DD_RESTO:
+			POP DX                  ; Resto da divisao
+			ADD DL, 30h             ; ADD 30h (2) to DL
+			MOV DDMMAAAA[SI],DL
+			INC	SI
+			LOOP DD_RESTO            
+			MOV DL, '/'             ; Separador
+			MOV DDMMAAAA[SI],DL
+			INC SI
+	; MES -------------------
+	; DX=DX/AX --- RESTO DX
+			MOV DX, 0               ; Limpar DX
+			POP AX                  ; Tira mes da pilha
+			XOR CX,CX               
+			MOV BX, 10				; Divisor
+			MOV CX,2
+	MM_DIV:                         
+			DIV BX                  ; Divisao or 10
+			PUSH DX                 ; Resto para pilha
+			MOV DX, 0               ; Limpa resto
+			LOOP MM_DIV
+			MOV CX,2 
+	MM_RESTO:
+			POP DX                  ; Resto
+			ADD DL, 30h             ; SOMA 30h
+			MOV DDMMAAAA[SI],DL
+			INC SI		
+			LOOP MM_RESTO
+			
+			MOV DL, '/'             ; Character to display goes in DL
+			MOV DDMMAAAA[SI],DL
+			INC SI
+	
+	;  ANO ----------------------
+			MOV DX, 0               
+			POP AX                  ; mes para AX
+			MOV CX, 0               ; 
+			MOV BX, 10              ; 
+	AA_DIV:                         
+			DIV BX                   
+			PUSH DX                 ; Guarda resto
+			ADD CX, 1               ; Soma 1 contador
+			MOV DX, 0               ; Limpa resto
+			CMP AX, 0               ; Compara quotient com zero
+			JNE AA_DIV              ; Se nao zero
+	AA_RESTO:
+			POP DX                  
+			ADD DL, 30h             ; ADD 30h (2) to DL
+			MOV DDMMAAAA[SI],DL
+			INC SI
+			LOOP AA_RESTO
+			POPF
+			POP SI
+			POP DX
+			POP CX
+			POP BX
+			POP AX
+			RET 
 HOJE   ENDP 
 
 ;########################################################################
@@ -242,102 +242,102 @@ ENDM
 
 Trata_Horas PROC
 
-		PUSHF
-		PUSH AX
-		PUSH BX
-		PUSH CX
-		PUSH DX		
+			PUSHF
+			PUSH AX
+			PUSH BX
+			PUSH CX
+			PUSH DX		
 
-		CALL 	Ler_TEMPO				; Horas MINUTOS e segundos do Sistema
-		
-		MOV		AX, Segundos
-		cmp		AX, Old_seg			; VErifica se os segundos mudaram desde a ultima leitura
-		je		fim_horas			; Se a hora não mudou desde a última leitura sai.
-		mov		Old_seg, AX			; Se segundos são diferentes actualiza informação do tempo 
-		
-		mov 	ax,Horas
-		MOV		bl, 10     
-		div 	bl
-		add 	al, 30h				; Caracter Correspondente às dezenas
-		add		ah,	30h				; Caracter Correspondente às unidades
-		MOV 	STR12[0],al			; 
-		MOV 	STR12[1],ah
-		MOV 	STR12[2],'h'		
-		MOV 	STR12[3],'$'
-		GOTO_XY 2,0 				;localizacao horas
-		MOSTRA STR12 		
-        
-		mov 	ax,Minutos
-		MOV 	bl, 10     
-		div 	bl
-		add 	al, 30h				; Caracter Correspondente às dezenas
-		add		ah,	30h				; Caracter Correspondente às unidades
-		MOV 	STR12[0],al			; 
-		MOV 	STR12[1],ah
-		MOV 	STR12[2],'m'		
-		MOV 	STR12[3],'$'
-		GOTO_XY	6,0
-		MOSTRA	STR12 		
-		
-		mov 	ax,Segundos
-		MOV 	bl, 10     
-		div 	bl
-		add 	al, 30h				; Caracter Correspondente às dezenas
-		add		ah,	30h				; Caracter Correspondente às unidades
-		MOV 	STR12[0],al			; 
-		MOV 	STR12[1],ah
-		MOV 	STR12[2],'s'		
-		MOV 	STR12[3],'$'
-		GOTO_XY	10,0
-		MOSTRA	STR12 
+			CALL 	Ler_TEMPO				; Horas MINUTOS e segundos do Sistema
+			
+			MOV		AX, Segundos
+			cmp		AX, Old_seg			; VErifica se os segundos mudaram desde a ultima leitura
+			je		fim_horas			; Se a hora não mudou desde a última leitura sai.
+			mov		Old_seg, AX			; Se segundos são diferentes actualiza informação do tempo 
+			
+			mov 	ax,Horas
+			MOV		bl, 10     
+			div 	bl
+			add 	al, 30h				; Caracter Correspondente às dezenas
+			add		ah,	30h				; Caracter Correspondente às unidades
+			MOV 	STR12[0],al			; 
+			MOV 	STR12[1],ah
+			MOV 	STR12[2],'h'		
+			MOV 	STR12[3],'$'
+			GOTO_XY 2,0 				;localizacao horas
+			MOSTRA STR12 		
+			
+			mov 	ax,Minutos
+			MOV 	bl, 10     
+			div 	bl
+			add 	al, 30h				; Caracter Correspondente às dezenas
+			add		ah,	30h				; Caracter Correspondente às unidades
+			MOV 	STR12[0],al			; 
+			MOV 	STR12[1],ah
+			MOV 	STR12[2],'m'		
+			MOV 	STR12[3],'$'
+			GOTO_XY	6,0
+			MOSTRA	STR12 		
+			
+			mov 	ax,Segundos
+			MOV 	bl, 10     
+			div 	bl
+			add 	al, 30h				; Caracter Correspondente às dezenas
+			add		ah,	30h				; Caracter Correspondente às unidades
+			MOV 	STR12[0],al			; 
+			MOV 	STR12[1],ah
+			MOV 	STR12[2],'s'		
+			MOV 	STR12[3],'$'
+			GOTO_XY	10,0
+			MOSTRA	STR12 
 
-		mov 	ax, Tempo_j			; Contador
-		inc 	Tempo_j
-		MOV 	bl, 10     
-		div 	bl
-		add 	al, 30h				; Caracter Correspondente às dezenas
-		add		ah,	30h				; Caracter Correspondente às unidades
-		MOV 	String_TJ[0],al			; 
-		MOV 	String_TJ[1],ah		
-		goto_xy	58,0
-		MOSTRA	String_TJ		
-		call	VERIFICA_DERROTA
-        
-		CALL 	HOJE				; Data de HOJE
-		MOV 	al ,DDMMAAAA[0]	
-		MOV 	STR12[0], al	
-		MOV 	al ,DDMMAAAA[1]	
-		MOV 	STR12[1], al	
-		MOV 	al ,DDMMAAAA[2]	
-		MOV 	STR12[2], al	
-		MOV 	al ,DDMMAAAA[3]	
-		MOV 	STR12[3], al	
-		MOV 	al ,DDMMAAAA[4]	
-		MOV 	STR12[4], al	
-		MOV 	al ,DDMMAAAA[5]	
-		MOV 	STR12[5], al	
-		MOV 	al ,DDMMAAAA[6]	
-		MOV 	STR12[6], al	
-		MOV 	al ,DDMMAAAA[7]	
-		MOV 	STR12[7], al	
-		MOV 	al ,DDMMAAAA[8]	
-		MOV 	STR12[8], al
-		MOV 	al ,DDMMAAAA[9]	
-		MOV 	STR12[9], al		
-		MOV 	STR12[10],'$'
-		GOTO_XY	67,0
-		MOSTRA	STR12 	
-		
-						
-fim_horas:		
-		goto_xy	POSx,POSy			; Volta a colocar o cursor onde estava antes de actualizar as horas
-		
-		POPF
-		POP DX		
-		POP CX
-		POP BX
-		POP AX
-		RET		
+			mov 	ax, Tempo_j			; Contador
+			inc 	Tempo_j
+			MOV 	bl, 10     
+			div 	bl
+			add 	al, 30h				; Caracter Correspondente às dezenas
+			add		ah,	30h				; Caracter Correspondente às unidades
+			MOV 	String_TJ[0],al			; 
+			MOV 	String_TJ[1],ah		
+			goto_xy	58,0
+			MOSTRA	String_TJ		
+			call	VERIFICA_DERROTA
+			
+			CALL 	HOJE				; Data de HOJE
+			MOV 	al ,DDMMAAAA[0]	
+			MOV 	STR12[0], al	
+			MOV 	al ,DDMMAAAA[1]	
+			MOV 	STR12[1], al	
+			MOV 	al ,DDMMAAAA[2]	
+			MOV 	STR12[2], al	
+			MOV 	al ,DDMMAAAA[3]	
+			MOV 	STR12[3], al	
+			MOV 	al ,DDMMAAAA[4]	
+			MOV 	STR12[4], al	
+			MOV 	al ,DDMMAAAA[5]	
+			MOV 	STR12[5], al	
+			MOV 	al ,DDMMAAAA[6]	
+			MOV 	STR12[6], al	
+			MOV 	al ,DDMMAAAA[7]	
+			MOV 	STR12[7], al	
+			MOV 	al ,DDMMAAAA[8]	
+			MOV 	STR12[8], al
+			MOV 	al ,DDMMAAAA[9]	
+			MOV 	STR12[9], al		
+			MOV 	STR12[10],'$'
+			GOTO_XY	67,0
+			MOSTRA	STR12 	
+			
+							
+	fim_horas:		
+			goto_xy	POSx,POSy			; Volta a colocar o cursor onde estava antes de actualizar as horas
+			
+			POPF
+			POP DX		
+			POP CX
+			POP BX
+			POP AX
+			RET		
 			
 Trata_Horas ENDP
 
@@ -351,7 +351,7 @@ apaga_ecran	proc
 			xor		bx,bx
 			mov		cx,25*80
 		
-apaga:		mov		byte ptr es:[bx],' '
+	apaga:		mov		byte ptr es:[bx],' '
 			mov		byte ptr es:[bx+1],7
 			inc		bx
 			inc 	bx
@@ -365,52 +365,52 @@ apaga_ecran	endp
 
 IMP_FICH	PROC
 
-		;abre ficheiro
-        mov     ah,3dh
-        mov     al,0
-        lea     dx,Fich
-        int     21h
-        jc      erro_abrir
-        mov     HandleFich,ax
-        jmp     ler_ciclo ;salta para ler_ciclo
+			;abre ficheiro
+			mov     ah,3dh
+			mov     al,0
+			lea     dx,Fich
+			int     21h
+			jc      erro_abrir
+			mov     HandleFich,ax
+			jmp     ler_ciclo ;salta para ler_ciclo
 
-erro_abrir:
-        mov     ah,09h
-        lea     dx,Erro_Open
-        int     21h
-        jmp     sai_f
+	erro_abrir:
+			mov     ah,09h
+			lea     dx,Erro_Open
+			int     21h
+			jmp     sai_f
 
-ler_ciclo:
-        mov     ah,3fh
-        mov     bx,HandleFich
-        mov     cx,1
-        lea     dx,car_fich
-        int     21h			;read from file | BX = file handle | CX = number of bytes to read | DS:DX -> buffer for data
-		jc		erro_ler
-		cmp		ax,0		;EOF?
-		je		fecha_ficheiro
-        mov     ah,02h
-		mov		dl,car_fich
-		int		21h
-		jmp		ler_ciclo
+	ler_ciclo:
+			mov     ah,3fh
+			mov     bx,HandleFich
+			mov     cx,1
+			lea     dx,car_fich
+			int     21h			;read from file | BX = file handle | CX = number of bytes to read | DS:DX -> buffer for data
+			jc		erro_ler
+			cmp		ax,0		;EOF?
+			je		fecha_ficheiro
+			mov     ah,02h
+			mov		dl,car_fich
+			int		21h
+			jmp		ler_ciclo
 
-erro_ler:
-        mov     ah,09h
-        lea     dx,Erro_Ler_Msg
-        int     21h
+	erro_ler:
+			mov     ah,09h
+			lea     dx,Erro_Ler_Msg
+			int     21h
 
-fecha_ficheiro:
-        mov     ah,3eh
-        mov     bx,HandleFich
-        int     21h
-        jnc     sai_f
+	fecha_ficheiro:
+			mov     ah,3eh
+			mov     bx,HandleFich
+			int     21h
+			jnc     sai_f
 
-        mov     ah,09h
-        lea     dx,Erro_Close
-        Int     21h
-sai_f:	
-		RET
-		
+			mov     ah,09h
+			lea     dx,Erro_Close
+			Int     21h
+	sai_f:	
+			RET
+			
 IMP_FICH	endp		
 
 
@@ -419,25 +419,25 @@ IMP_FICH	endp
 
 LE_TECLA	PROC
 
-sem_tecla:
-		call Trata_Horas
-		MOV AH, 0BH
-		INT 21h
-		CMP AL,0
-		JE sem_tecla
+	sem_tecla:
+			call Trata_Horas
+			MOV AH, 0BH
+			INT 21h
+			CMP AL,0
+			JE sem_tecla
 
-		mov		ah,08h
-		int		21h      ;le a tecla q pressionas
-		mov		ah,0
-		cmp		al,0
-		jne		SAI_TECLA ;saltar para sai_tecla se nao zero
-		mov		ah, 08h
-		int		21h
-		mov		ah,1
-		;call WIN 			;ve se ganhaste e se sim limpa o contador e as letras q ja encontraste
-		
+			mov		ah,08h
+			int		21h      ;le a tecla q pressionas
+			mov		ah,0
+			cmp		al,0
+			jne		SAI_TECLA ;saltar para sai_tecla se nao zero
+			mov		ah, 08h
+			int		21h
+			mov		ah,1
+			;call WIN 			;ve se ganhaste e se sim limpa o contador e as letras q ja encontraste
+			
 
-SAI_TECLA:	RET
+	SAI_TECLA:	RET
 LE_TECLA	endp
 
 
@@ -494,7 +494,7 @@ MENU	PROC
 	FIM:	mov			ah,4CH
 			INT			21H
 
-SAI_MENU:
+	SAI_MENU:
 		RET
 
 MENU	endp
