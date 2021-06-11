@@ -83,7 +83,6 @@ dseg	segment para public 'data'
 	POSx			db	3	; POSx pode ir [1..80]
 	POSya			db	3	; Posicao anterior de y
 	POSxa			db	3	; Posicao anterior de x
-	keep			db 	0
 
 dseg	ends
 
@@ -749,7 +748,6 @@ VERIFICA_DERROTA PROC
 		mov 	POSy, 3
 		mov		Nivel, 49
 		mov 	POSx, 3 
-		mov 	keep, 1
 		call 	Main
 
 	FIM: 	
@@ -848,7 +846,6 @@ WIN	PROC
 
 		mov POSy, 3		;mete o avatar nesta posicao
 		mov POSx, 3 
-		mov keep, 1		;
 
 		;dependendo do nivel para q vamos altera a palavra e limite de tempo no contador
 		cmp	Nivel, 50	;50 em ascii -> 2
@@ -995,8 +992,12 @@ Main  proc
 	goto_xy		0,0
 	call		IMP_FICH  ;abrir o ficheiro
 
-	cmp keep, 1 ;se keep for 1 vai para ultimo_caracter (apenas nao corre no primeio nivel)
-	je ultimo_caracter
+	ultimo_caracter: ;Repoe ultimo caracter que o avatar pisou antes de passar para o proximo nivel
+	 	goto_xy POSy, POSx
+	 	mov		ah, 02h
+	 	mov		dl, Car			
+	 	int		21H
+		jmp voltar_avatar
 
 	voltar_avatar:
 		call AVATAR 
@@ -1006,14 +1007,6 @@ Main  proc
 	
 	mov			ah,4CH
 	INT			21H     ;return control to the operating system (stop program)
-
-	ultimo_caracter: ;Repoe ultimo caracter que o avatar pisou antes de passar para o proximo nivel
-		goto_xy POSy, POSx
-		mov		ah, 02h
-		mov		dl, Car			
-		int		21H
-		jmp voltar_avatar
-
 
 Main	endp
 
