@@ -68,6 +68,7 @@ dseg	segment para public 'data'
         Erro_Ler_Msg    db      'Erro ao tentar ler do ficheiro$'
         Erro_Close      db      'Erro ao tentar fechar o ficheiro$'
         Fich         	db      'labi.TXT',0
+		Ficht         	db      'titulo.TXT',0
         HandleFich      dw      0
         car_fich        db      ?
 
@@ -414,6 +415,56 @@ IMP_FICH	PROC
 IMP_FICH	endp		
 
 
+IMP_FICHT	PROC
+
+		;abre ficheiro
+        mov     ah,3dh
+        mov     al,0
+        lea     dx,Ficht
+        int     21h
+        jc      erro_abrir
+        mov     HandleFich,ax
+        jmp     ler_ciclo ;salta para ler_ciclo
+
+erro_abrir:
+        mov     ah,09h
+        lea     dx,Erro_Open
+        int     21h
+        jmp     sai_f
+
+ler_ciclo:
+        mov     ah,3fh
+        mov     bx,HandleFich
+        mov     cx,1
+        lea     dx,car_fich
+        int     21h			;read from file | BX = file handle | CX = number of bytes to read | DS:DX -> buffer for data
+		jc		erro_ler
+		cmp		ax,0		;EOF?
+		je		fecha_ficheiro
+        mov     ah,02h
+		mov		dl,car_fich
+		int		21h
+		jmp		ler_ciclo
+
+erro_ler:
+        mov     ah,09h
+        lea     dx,Erro_Ler_Msg
+        int     21h
+
+fecha_ficheiro:
+        mov     ah,3eh
+        mov     bx,HandleFich
+        int     21h
+        jnc     sai_f
+
+        mov     ah,09h
+        lea     dx,Erro_Close
+        Int     21h
+sai_f:	
+		RET
+		
+IMP_FICHT	endp		
+
 ;########################################################################
 ; LE UMA TECLA	
 
@@ -443,9 +494,10 @@ LE_TECLA	endp
 
 MENU	PROC
 
+	goto_xy 0,0
+	call 	IMP_FICHT
 	goto_xy 27,8
 	MOSTRA 	string
-
 	goto_xy 29,10
 	MOSTRA Nivel_atual
 	goto_xy 44,10
@@ -687,6 +739,9 @@ VERIFICA_DERROTA	PROC
 				mov 	String_nome[2], "E"
 				mov 	String_nome[3], "C" 
 				mov 	String_nome[4], "$" 
+				mov	String_TJ[3], "1"
+				mov String_TJ[4], "0"
+				mov String_TJ[5], "0"
 				mov 	Tempo_limite, 101
 				mov 	Tempo_j, 0
 				mov 	POSy, 3
