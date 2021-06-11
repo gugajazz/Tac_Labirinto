@@ -48,12 +48,13 @@ dseg	segment para public 'data'
 		indice_nome		dw		0	; indice que aponta para Construir_nome
 
 		
-		Fim_Ganhou		db	    " Ganhou $"	
+		Fim_Ganhou		db	    " Parabens, Ganhou o Jogo$"	
 		Fim_Perdeu		db	    " Perdeu o jogo $"
 		Fim_Reiniciar	db		" Quer reiniciar o jogo? $"
 		Fim_Escolha		db		" (1)Sim	(2)Nao $"
 		Fim_Nivel		db	    " Passou de nivel $"	
 		Proximo_Nivel	db	    " Prima uma tecla para avancar para o proximo nivel $"	
+		Mensagem_sair	db	    " Prima uma tecla para sair $"
 		Nivel_atual		db	    " Esta no nivel $"
 
 
@@ -504,6 +505,16 @@ MENU	endp
 
 AVATAR	PROC
 
+	CALL apaga_ecran
+	goto_xy 27,10 ;centro do ecra
+	MOSTRA Fim_Ganhou
+	goto_xy 26,12 ;centro do ecra
+	MOSTRA Mensagem_sair
+
+	goto_xy		0,22
+	mov			ah,4CH
+	INT			21H     ;return control to the operating system (stop program)
+
 	mov keep, 0
 
 	mov		ax,0B800h
@@ -735,14 +746,16 @@ WIN	PROC
 		mov POSx, 3 
 		mov keep, 1
 
-		cmp	Nivel, 50
+		cmp	Nivel, 50	;50 em ascii -> 2
 		je	NIVEL2
-		cmp Nivel, 51
+		cmp Nivel, 51	;51 em ascii -> 3
 		je NIVEL3
-		cmp Nivel, 52
+		cmp Nivel, 52	;52 em ascii -> 4
 		je NIVEL4
-		cmp Nivel, 53
+		cmp Nivel, 53 	;53 em ascii -> 5
 		je NIVEL5
+		cmp Nivel, 54 	;54 em ascii -> 6
+		je ECRA_VITORIA
 		;ret 
 	NIVEL2:	mov Construir_nome[0], "_"
 			mov Construir_nome[1], "_"
@@ -819,6 +832,23 @@ WIN	PROC
 			mov String_TJ[5], "$"
 			mov Tempo_limite, 61
 			jmp FIM_WIN
+	
+	ECRA_VITORIA:
+			CALL apaga_ecran
+			goto_xy 27,10 ;centro do ecra
+			MOSTRA Fim_Ganhou
+			goto_xy 20,8 ;centro do ecra
+			MOSTRA Mensagem_sair
+
+			mov		ah,08h
+			int		21h      ;le a tecla q pressionas
+			mov		ah,0
+			cmp		al,0
+			jne		SAIR_JOGO ;saltar para sai_tecla se nao zero
+
+			SAIR_JOGO:
+			mov			ah,4CH
+			INT			21H     ;return control to the operating system (stop program)
 
 			
 	FIM_WIN:
