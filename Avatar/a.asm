@@ -57,6 +57,8 @@ dseg	segment para public 'data'
 		Mensagem_sair	db	    " Prima uma tecla para sair $"
 		Nivel_atual		db	    " Esta no nivel $"
 
+		Pontos			dw		100
+		String_pontos	db		"Pontuacao:   $"
 
 		Jogar			db	    " (1)Jogar $"
 		Top10			db	    " (2)Top 10 $"
@@ -291,6 +293,18 @@ Trata_Horas PROC
 		MOV 	STR12[3],'$'
 		GOTO_XY	10,0
 		MOSTRA	STR12 
+
+
+		mov 	ax, Pontos					; Contador para pontos
+		dec		Pontos
+		mov		bl, 10
+		div		bl					
+		add 	al, 30h						; Caracter Correspondente às dezenas
+		add 	ah, 30h						; Caracter Correspondente às unidades
+		mov 	String_pontos[11], al		
+		mov 	String_pontos[12], ah
+		goto_xy	34,0
+		MOSTRA	String_pontos
 
 		mov 	ax, Tempo_j			; Contador
 		inc 	Tempo_j
@@ -739,11 +753,12 @@ VERIFICA_DERROTA	PROC
 				mov 	String_nome[2], "E"
 				mov 	String_nome[3], "C" 
 				mov 	String_nome[4], "$" 
-				mov	String_TJ[3], "1"
-				mov String_TJ[4], "0"
-				mov String_TJ[5], "0"
+				mov		String_TJ[3], "1"
+				mov 	String_TJ[4], "0"
+				mov 	String_TJ[5], "0"
 				mov 	Tempo_limite, 101
 				mov 	Tempo_j, 0
+				mov		Pontos, 99 
 				mov 	POSy, 3
 				mov		Nivel, 49
 				mov 	POSx, 3 
@@ -770,8 +785,13 @@ WIN	PROC
 	PROX_NIVEL:	call apaga_ecran
 				goto_xy 31,10
 				MOSTRA Fim_Nivel
-				goto_xy 15,12
+				goto_xy 33,12
+				MOSTRA 	String_pontos
+				goto_xy 15,14
 				MOSTRA Proximo_Nivel
+				
+			
+				
 
 	AVANCAR:	mov		ah,08h
 				int		21h      
@@ -816,6 +836,7 @@ WIN	PROC
 			mov String_TJ[4], "0"
 			mov String_TJ[5], "$"
 			mov Tempo_limite, 91
+			mov	Pontos, 90 
 			jmp FIM_WIN
 
 	NIVEL3:	mov Construir_nome[0], "_"
@@ -834,6 +855,7 @@ WIN	PROC
 			mov String_TJ[4], "0"
 			mov String_TJ[5], "$"
 			mov Tempo_limite, 81
+			mov	Pontos, 80
 			jmp FIM_WIN
 
 	NIVEL4:	mov Construir_nome[0], "_"
@@ -854,6 +876,7 @@ WIN	PROC
 			mov String_TJ[4], "0"
 			mov String_TJ[5], "$"
 			mov Tempo_limite, 71
+			mov	Pontos, 70 
 			jmp FIM_WIN
 
 	NIVEL5:	mov Construir_nome[0], "_"
@@ -876,6 +899,7 @@ WIN	PROC
 			mov String_TJ[4], "0"
 			mov String_TJ[5], "$"
 			mov Tempo_limite, 61
+			mov	Pontos, 60 
 			jmp FIM_WIN
 	
 	ECRA_VITORIA:
