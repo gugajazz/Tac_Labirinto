@@ -3,7 +3,9 @@
 ;                                                                             ;   
 ;	ANO LECTIVO 2020/2021                                                     ;
 ;-----------------------------------------------------------------------------;
-; Demostracao da navegacao do Ecran com um avatar                             ;
+;Trabalho realizado por:                                                      ;
+;                       Gustavo Mateus - 2020138902                           ;
+;                       Hugo Gil - 2020130870                                 ;
 ;                                                                             ;
 ;		arrow keys to move                                                    ;
 ;		press ESC to exit                                                     ;
