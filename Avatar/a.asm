@@ -505,16 +505,6 @@ MENU	endp
 
 AVATAR	PROC
 
-	CALL apaga_ecran
-	goto_xy 27,10 ;centro do ecra
-	MOSTRA Fim_Ganhou
-	goto_xy 26,12 ;centro do ecra
-	MOSTRA Mensagem_sair
-
-	goto_xy		0,22
-	mov			ah,4CH
-	INT			21H     ;return control to the operating system (stop program)
-
 	mov keep, 0
 
 	mov		ax,0B800h
