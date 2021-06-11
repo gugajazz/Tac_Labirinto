@@ -386,7 +386,7 @@ IMP_FICH	PROC
 	int     21h
 	jc      erro_abrir
 	mov     HandleFich,ax
-	jmp     ler_ciclo ;salta para ler_ciclo
+	jmp     ler_ciclo 		;salta para ler_ciclo
 
 	erro_abrir:
 		mov     ah,09h
@@ -401,7 +401,7 @@ IMP_FICH	PROC
 		lea     dx,car_fich
 		int     21h			;read from file | BX = file handle | CX = number of bytes to read | DS:DX -> buffer for data
 		jc		erro_ler
-		cmp		ax,0		;EOF?
+		cmp		ax,0		
 		je		fecha_ficheiro
 		mov     ah,02h
 		mov		dl,car_fich
@@ -452,7 +452,7 @@ IMP_FICHT	PROC ;para o titulo
         lea     dx,car_fich
         int     21h			;read from file | BX = file handle | CX = number of bytes to read | DS:DX -> buffer for data
 		jc		erro_ler
-		cmp		ax,0		;EOF?
+		cmp		ax,0		
 		je		fecha_ficheiro
         mov     ah,02h
 		mov		dl,car_fich
@@ -495,9 +495,7 @@ LE_TECLA	PROC
 		jne		SAI_TECLA ;saltar para sai_tecla se nao zero
 		mov		ah, 08h
 		int		21h
-		mov		ah,1
-		;call WIN 			;ve se ganhaste e se sim limpa o contador e as letras q ja encontraste
-		
+		mov		ah,1		
 
 	SAI_TECLA:	
 		RET
@@ -529,15 +527,13 @@ MENU PROC
 	AVANCAR:	
 		mov		ah,08h
 		int		21h      
-		cmp		al, 0
-		je		AVANCAR ;se nao houver input continua no loop
 		cmp 	al, '1'
 		je		SAI_MENU
 		cmp 	al,	'2'
 		je		ERROTOP10
 		cmp		al, '3'
 		je 		FIM
-		jmp		AVANCAR
+		jmp		AVANCAR ;se nao houver input continua no loop
 
 
 	ERROTOP10: 		
@@ -564,10 +560,8 @@ MENU	endp
 
 AVATAR	PROC
 	
-	mov keep, 0
 	mov		ax,0B800h
 	mov		es,ax
-
 
 	goto_xy	POSx,POSy		; Vai para nova possicao
 	mov 	ah, 08h			; Guarda o Caracter que esta na posicao do Cursor
@@ -612,28 +606,25 @@ AVATAR	PROC
 				
 
 
-	VERIFICA:	
-		cmp keep, 1 ;se keep = 1 sai para o main
-		je FIM
-
+	VERIFICA:	;ver se o caracter que estamos a pisar pertence a palavra
 		mov ah, String_nome[si]
 		cmp ah, '$'
-		je 	IMPRIME ;se acabou
+		je 	IMPRIME ;palavra ja acabou
 		cmp	Car, ah		
-		je	IMPRIME_GAME
+		je	IMPRIME_GAME 
 		inc si
 		jmp VERIFICA
 
-	IMPRIME:	
+	IMPRIME:	;print do avatar
 		goto_xy	POSx,POSy
 		mov		ah, 02h
 		mov		dl, 190		; Coloca AVATAR, sem isto avatar n aparece
 		int		21H	
-		goto_xy	POSx,POSy	; Vai para posi��o do cursor
+		goto_xy	POSx,POSy	; Vai para posicao do cursor
 	
-		mov		al, POSx	; Guarda a posi��o do cursor
+		mov		al, POSx	; Guarda a posicao do cursor
 		mov		POSxa, al
-		mov		al, POSy	; Guarda a posi��o do cursor
+		mov		al, POSy	; Guarda a posicao do cursor
 		mov 	POSya, al
 			
 	LER_SETA:	
@@ -645,59 +636,63 @@ AVATAR	PROC
 		JE		FIM      ;jump if zero
 		jmp		LER_SETA
 			
-	ESTEND:		
+	ESTEND:	
 		cmp 	al,48h
 		jne		BAIXO
 		dec		POSy		;cima
-		goto_xy	POSx,POSy			
-		mov		ah, 08h
+		goto_xy	POSx,POSy
+
+		mov		ah, 08h 
 		mov 	bh, 0
-		int 	10h
-		cmp 	al, 177
-		jne 	CICLO  
-		inc		POSy
+		int 	10h ;ler o caracter q estamos a pisar
+		cmp 	al, 177 ;177 é a parede
+		jne 	CICLO  ;se n estas na parede
+		inc		POSy   ;desce um pixel
 		jmp		CICLO
 
 	BAIXO:		
 		cmp		al,50h
 		jne		ESQUERDA
 		inc 	POSy		;Baixo
-		goto_xy	POSx,POSy			
+		goto_xy	POSx,POSy	
+
 		mov		ah, 08h
 		mov 	bh, 0
 		int 	10h
 		cmp 	al, 177
 		jne 	CICLO  
-		dec		POSy		
+		dec		POSy	;sobe um pixel	
 		jmp 	CICLO
 
 	ESQUERDA:
 		cmp		al,4Bh
 		jne		DIREITA
 		dec		POSx		;Esquerda
-		goto_xy	POSx,POSy			
+		goto_xy	POSx,POSy	
+
 		mov		ah, 08h
 		mov 	bh, 0
 		int 	10h
 		cmp 	al, 177
 		jne 	CICLO  
-		inc		POSx
+		inc		POSx   ;um pixel p a direita
 		jmp		CICLO
 
 	DIREITA:
 		cmp		al,4Dh
 		jne		LER_SETA 
 		inc		POSx		;Direita
-		goto_xy	POSx,POSy			
+		goto_xy	POSx,POSy	
+
 		mov		ah, 08h
 		mov 	bh, 0
 		int 	10h
 		cmp 	al, 177
 		jne 	CICLO  
-		dec		POSx
+		dec		POSx    ;um pixel p a esquerda
 		jmp		CICLO
 
-	IMPRIME_GAME:	
+	IMPRIME_GAME:	;troca o "_" pela letra que pisamos
 		mov al, Car
 		mov Construir_nome[si], al
 		goto_xy 10,21
@@ -711,11 +706,11 @@ AVATAR	PROC
 AVATAR		endp
 
 
-VERIFICA_DERROTA	PROC
+VERIFICA_DERROTA PROC
 
 	mov 	ax, Tempo_limite
 	cmp 	Tempo_j, ax
-	je		DERROTA
+	je		DERROTA ;compara tempo c tempo limite e se igual vai p derrota
 	RET
 
 	DERROTA:	
@@ -728,15 +723,13 @@ VERIFICA_DERROTA	PROC
 		MOSTRA 	Fim_Escolha
 		mov		ah,08h
 		int		21h      
-		cmp		al, '0'
-		je		DERROTA
-		cmp		al, '2'
+		cmp		al, '2' ;se for dois sai do programa
 		je		FIM
-		cmp		al, '1'
+		cmp		al, '1' ;se for um vai p o sai menu
 		je		SAI_MENU
 		jmp		DERROTA
 
-	SAI_MENU:
+	SAI_MENU: ;se reiniciares poe tudo como no primeiro nivel
 		mov 	Construir_nome[0], "_"
 		mov 	Construir_nome[1], "_"
 		mov 	Construir_nome[2], "_"
@@ -760,6 +753,7 @@ VERIFICA_DERROTA	PROC
 		call 	Main
 
 	FIM: 	
+		goto_xy	0,22 ;para o path ficar no fundo da consola quando clicamos esc
 		mov		ah,4ch
 		int		21h  
 
@@ -768,14 +762,14 @@ VERIFICA_DERROTA	endp
 
 WIN	PROC
 
-	xor di, di
+	xor di, di ;fazer di=0
 
-	VERIFICA_WIN:	
-		cmp Construir_nome[di], '$'
+	VERIFICA_WIN:
+		cmp Construir_nome[di], '$' ;ver se ja temos as letras todas
 		je 	PROX_NIVEL
-		cmp Construir_nome[di], '_'
+		cmp Construir_nome[di], '_' ;se isto for verdade a palavra nao esta completa e sai
 		je	FIM
-		inc di
+		inc di 				;se nao for nenhum dos acima incrementa e continua o loop (havia uma letra no espaco)
 		jmp VERIFICA_WIN
 
 	PROX_NIVEL:	
@@ -787,7 +781,8 @@ WIN	PROC
 		goto_xy 15,14
 		MOSTRA Proximo_Nivel
 
-		cmp Nivel, 49
+		;guarda a pontuacao na variavel correspondente ao nivel atual
+		cmp Nivel, 49 ;49 em ascii = 1
 		je n1
 
 		cmp Nivel, 50
@@ -803,10 +798,10 @@ WIN	PROC
 
 		n1:
 		mov BL, String_pontos[11]
-		mov Pontuacao_n1[19], BL
+		mov Pontuacao_n1[19], BL ;guarda o 1o digito dos pontos no 1o digito da Pontuacao_n1
 
 		mov BH, String_pontos[12]
-		mov Pontuacao_n1[20], BH
+		mov Pontuacao_n1[20], BH ;guarda o 2o digito dos pontos no 2o digito da Pontuacao_n1
 
 		n2:
 		mov BL, String_pontos[11]
@@ -836,11 +831,10 @@ WIN	PROC
 		mov BH, String_pontos[12]
 		mov Pontuacao_n5[20], BH
 
-	AVANCAR:	
+	AVANCAR:	;espera que o jogador pressione uma tecla p sair
 		mov		ah,08h
 		int		21h      
 		cmp		al, 0
-		;jne		FIM
 		jne 	SAI_PARA_MENU
 		jmp		AVANCAR
 
@@ -849,13 +843,14 @@ WIN	PROC
 
 	SAI_PARA_MENU: ;sai do loop e vai para o menu
 
-		mov Tempo_j, 0
-		inc Nivel
+		mov Tempo_j, 0 ;cronometro volta a zero
+		inc Nivel      ;nivel aumenta
 
-		mov POSy, 3
+		mov POSy, 3		;mete o avatar nesta posicao
 		mov POSx, 3 
-		mov keep, 1
+		mov keep, 1		;
 
+		;dependendo do nivel para q vamos altera a palavra e limite de tempo no contador
 		cmp	Nivel, 50	;50 em ascii -> 2
 		je	NIVEL2
 		cmp Nivel, 51	;51 em ascii -> 3
@@ -866,7 +861,7 @@ WIN	PROC
 		je NIVEL5
 		cmp Nivel, 54 	;54 em ascii -> 6
 		je ECRA_VITORIA
-		;ret 
+		 
 	NIVEL2:	
 		mov Construir_nome[0], "_"
 		mov Construir_nome[1], "_"
@@ -1000,7 +995,7 @@ Main  proc
 	goto_xy		0,0
 	call		IMP_FICH  ;abrir o ficheiro
 
-	cmp keep, 1
+	cmp keep, 1 ;se keep for 1 vai para ultimo_caracter (apenas nao corre no primeio nivel)
 	je ultimo_caracter
 
 	voltar_avatar:
@@ -1012,10 +1007,10 @@ Main  proc
 	mov			ah,4CH
 	INT			21H     ;return control to the operating system (stop program)
 
-	ultimo_caracter:
+	ultimo_caracter: ;Repoe ultimo caracter que o avatar pisou antes de passar para o proximo nivel
 		goto_xy POSy, POSx
 		mov		ah, 02h
-		mov		dl, Car			; Repoe Caracter guardado 
+		mov		dl, Car			
 		int		21H
 		jmp voltar_avatar
 
