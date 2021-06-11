@@ -59,6 +59,11 @@ dseg	segment para public 'data'
 
 		Pontos			dw		100
 		String_pontos	db		"Pontuacao:   $"
+		Pontuacao_n1	db		"Pontuacao Nivel 1:   $"	
+		Pontuacao_n2	db		"Pontuacao Nivel 2:   $"
+		Pontuacao_n3	db		"Pontuacao Nivel 3:   $"
+		Pontuacao_n4	db		"Pontuacao Nivel 4:   $"
+		Pontuacao_n5	db		"Pontuacao Nivel 5:   $"	
 
 		Jogar			db	    " (1)Jogar $"
 		Top10			db	    " (2)Top 10 $"
@@ -149,77 +154,77 @@ HOJE PROC
 		PUSH CX                 ; Dia -> PILHA
 		XOR DH,DH                    
 		XOR	SI,SI
-; DIA ------------------ 
-; DX=DX/AX --- RESTO DX   
-		XOR DX,DX               ; Limpa DX
-		POP AX                  ; Tira dia da pilha
-		MOV CX, 0               ; CX = 0 
-		MOV BX, 10              ; Divisor
-		MOV	CX,2
-DD_DIV:                         
-		DIV BX                  ; Divide por 10
-		PUSH DX                 ; Resto para pilha
-		MOV DX, 0               ; Limpa resto
-		loop dd_div
-		MOV	CX,2
-DD_RESTO:
-		POP DX                  ; Resto da divisao
-		ADD DL, 30h             ; ADD 30h (2) to DL
-		MOV DDMMAAAA[SI],DL
-		INC	SI
-		LOOP DD_RESTO            
-		MOV DL, '/'             ; Separador
-		MOV DDMMAAAA[SI],DL
-		INC SI
-; MES -------------------
-; DX=DX/AX --- RESTO DX
-		MOV DX, 0               ; Limpar DX
-		POP AX                  ; Tira mes da pilha
-		XOR CX,CX               
-		MOV BX, 10				; Divisor
-		MOV CX,2
-MM_DIV:                         
-		DIV BX                  ; Divisao or 10
-		PUSH DX                 ; Resto para pilha
-		MOV DX, 0               ; Limpa resto
-		LOOP MM_DIV
-		MOV CX,2 
-MM_RESTO:
-		POP DX                  ; Resto
-		ADD DL, 30h             ; SOMA 30h
-		MOV DDMMAAAA[SI],DL
-		INC SI		
-		LOOP MM_RESTO
-		
-		MOV DL, '/'             ; Character to display goes in DL
-		MOV DDMMAAAA[SI],DL
-		INC SI
- 
-;  ANO ----------------------
-		MOV DX, 0               
-		POP AX                  ; mes para AX
-		MOV CX, 0               ; 
-		MOV BX, 10              ; 
- AA_DIV:                         
-		DIV BX                   
-		PUSH DX                 ; Guarda resto
-		ADD CX, 1               ; Soma 1 contador
-		MOV DX, 0               ; Limpa resto
-		CMP AX, 0               ; Compara quotient com zero
-		JNE AA_DIV              ; Se nao zero
-AA_RESTO:
-		POP DX                  
-		ADD DL, 30h             ; ADD 30h (2) to DL
-		MOV DDMMAAAA[SI],DL
-		INC SI
-		LOOP AA_RESTO
-		POPF
-		POP SI
-		POP DX
-		POP CX
-		POP BX
-		POP AX
- 		RET 
+	; DIA ------------------ 
+	; DX=DX/AX --- RESTO DX   
+			XOR DX,DX               ; Limpa DX
+			POP AX                  ; Tira dia da pilha
+			MOV CX, 0               ; CX = 0 
+			MOV BX, 10              ; Divisor
+			MOV	CX,2
+	DD_DIV:                         
+			DIV BX                  ; Divide por 10
+			PUSH DX                 ; Resto para pilha
+			MOV DX, 0               ; Limpa resto
+			loop dd_div
+			MOV	CX,2
+	DD_RESTO:
+			POP DX                  ; Resto da divisao
+			ADD DL, 30h             ; ADD 30h (2) to DL
+			MOV DDMMAAAA[SI],DL
+			INC	SI
+			LOOP DD_RESTO            
+			MOV DL, '/'             ; Separador
+			MOV DDMMAAAA[SI],DL
+			INC SI
+	; MES -------------------
+	; DX=DX/AX --- RESTO DX
+			MOV DX, 0               ; Limpar DX
+			POP AX                  ; Tira mes da pilha
+			XOR CX,CX               
+			MOV BX, 10				; Divisor
+			MOV CX,2
+	MM_DIV:                         
+			DIV BX                  ; Divisao or 10
+			PUSH DX                 ; Resto para pilha
+			MOV DX, 0               ; Limpa resto
+			LOOP MM_DIV
+			MOV CX,2 
+	MM_RESTO:
+			POP DX                  ; Resto
+			ADD DL, 30h             ; SOMA 30h
+			MOV DDMMAAAA[SI],DL
+			INC SI		
+			LOOP MM_RESTO
+			
+			MOV DL, '/'             ; Character to display goes in DL
+			MOV DDMMAAAA[SI],DL
+			INC SI
+	
+	;  ANO ----------------------
+			MOV DX, 0               
+			POP AX                  ; mes para AX
+			MOV CX, 0               ; 
+			MOV BX, 10              ; 
+	AA_DIV:                         
+			DIV BX                   
+			PUSH DX                 ; Guarda resto
+			ADD CX, 1               ; Soma 1 contador
+			MOV DX, 0               ; Limpa resto
+			CMP AX, 0               ; Compara quotient com zero
+			JNE AA_DIV              ; Se nao zero
+	AA_RESTO:
+			POP DX                  
+			ADD DL, 30h             ; ADD 30h (2) to DL
+			MOV DDMMAAAA[SI],DL
+			INC SI
+			LOOP AA_RESTO
+			POPF
+			POP SI
+			POP DX
+			POP CX
+			POP BX
+			POP AX
+			RET 
 HOJE   ENDP 
 
 ;########################################################################
@@ -344,7 +349,7 @@ Trata_Horas PROC
 		MOSTRA	STR12 	
 		
 						
-fim_horas:		
+	fim_horas:		
 		goto_xy	POSx,POSy			; Volta a colocar o cursor onde estava antes de actualizar as horas
 		
 		POPF
@@ -366,7 +371,7 @@ apaga_ecran	proc
 			xor		bx,bx
 			mov		cx,25*80
 		
-apaga:		mov		byte ptr es:[bx],' '
+	apaga:	mov		byte ptr es:[bx],' '
 			mov		byte ptr es:[bx+1],7
 			inc		bx
 			inc 	bx
@@ -389,13 +394,13 @@ IMP_FICH	PROC
         mov     HandleFich,ax
         jmp     ler_ciclo ;salta para ler_ciclo
 
-erro_abrir:
+	erro_abrir:
         mov     ah,09h
         lea     dx,Erro_Open
         int     21h
         jmp     sai_f
 
-ler_ciclo:
+	ler_ciclo:
         mov     ah,3fh
         mov     bx,HandleFich
         mov     cx,1
@@ -409,12 +414,12 @@ ler_ciclo:
 		int		21h
 		jmp		ler_ciclo
 
-erro_ler:
+	erro_ler:
         mov     ah,09h
         lea     dx,Erro_Ler_Msg
         int     21h
 
-fecha_ficheiro:
+	fecha_ficheiro:
         mov     ah,3eh
         mov     bx,HandleFich
         int     21h
@@ -423,13 +428,13 @@ fecha_ficheiro:
         mov     ah,09h
         lea     dx,Erro_Close
         Int     21h
-sai_f:	
+	sai_f:	
 		RET
 		
 IMP_FICH	endp		
 
 
-IMP_FICHT	PROC
+IMP_FICHT	PROC ;para o titulo
 
 		;abre ficheiro
         mov     ah,3dh
@@ -440,13 +445,13 @@ IMP_FICHT	PROC
         mov     HandleFich,ax
         jmp     ler_ciclo ;salta para ler_ciclo
 
-erro_abrir:
+	erro_abrir:
         mov     ah,09h
         lea     dx,Erro_Open
         int     21h
         jmp     sai_f
 
-ler_ciclo:
+	ler_ciclo:
         mov     ah,3fh
         mov     bx,HandleFich
         mov     cx,1
@@ -460,12 +465,12 @@ ler_ciclo:
 		int		21h
 		jmp		ler_ciclo
 
-erro_ler:
+	erro_ler:
         mov     ah,09h
         lea     dx,Erro_Ler_Msg
         int     21h
 
-fecha_ficheiro:
+	fecha_ficheiro:
         mov     ah,3eh
         mov     bx,HandleFich
         int     21h
@@ -474,7 +479,7 @@ fecha_ficheiro:
         mov     ah,09h
         lea     dx,Erro_Close
         Int     21h
-sai_f:	
+	sai_f:	
 		RET
 		
 IMP_FICHT	endp		
@@ -484,7 +489,7 @@ IMP_FICHT	endp
 
 LE_TECLA	PROC
 
-sem_tecla:
+	sem_tecla:
 		call Trata_Horas
 		MOV AH, 0BH
 		INT 21h
@@ -502,7 +507,7 @@ sem_tecla:
 		;call WIN 			;ve se ganhaste e se sim limpa o contador e as letras q ja encontraste
 		
 
-SAI_TECLA:	RET
+	SAI_TECLA:	RET
 LE_TECLA	endp
 
 
@@ -560,7 +565,7 @@ MENU	PROC
 	FIM:	mov			ah,4CH
 			INT			21H
 
-SAI_MENU:
+	SAI_MENU:
 		RET
 
 MENU	endp
@@ -570,9 +575,8 @@ MENU	endp
 ; Avatar
 
 AVATAR	PROC
-
+	
 	mov keep, 0
-
 	mov		ax,0B800h
 	mov		es,ax
 
@@ -789,9 +793,55 @@ WIN	PROC
 				MOSTRA 	String_pontos
 				goto_xy 15,14
 				MOSTRA Proximo_Nivel
-				
-			
-				
+
+				cmp Nivel, 49
+				je n1
+
+				cmp Nivel, 50
+				je n2
+
+				cmp Nivel, 51
+				je n3
+
+				cmp Nivel, 52
+				je n4
+
+				jmp n5
+
+				n1:
+				mov BL, String_pontos[11]
+				mov Pontuacao_n1[19], BL
+
+				mov BH, String_pontos[12]
+				mov Pontuacao_n1[20], BH
+
+				n2:
+				mov BL, String_pontos[11]
+				mov Pontuacao_n2[19], BL
+
+				mov BH, String_pontos[12]
+				mov Pontuacao_n2[20], BH
+
+				n3:
+				mov BL, String_pontos[11]
+				mov Pontuacao_n3[19], BL
+
+				mov BH, String_pontos[12]
+				mov Pontuacao_n3[20], BH
+
+				n4:
+				mov BL, String_pontos[11]
+				mov Pontuacao_n4[19], BL
+
+				mov BH, String_pontos[12]
+				mov Pontuacao_n4[20], BH
+
+				n5:
+				mov BL, String_pontos[11]
+				mov Pontuacao_n5[19], BL
+
+				mov BH, String_pontos[12]
+				mov Pontuacao_n5[20], BH
 
 	AVANCAR:	mov		ah,08h
 				int		21h      
@@ -904,10 +954,28 @@ WIN	PROC
 	
 	ECRA_VITORIA:
 			CALL apaga_ecran
-			goto_xy 27,10 ;centro do ecra
+			goto_xy 27,8 ;centro do ecra
 			MOSTRA Fim_Ganhou
-			goto_xy 20,8 ;centro do ecra
+			goto_xy 26,10 ;centro do ecra
 			MOSTRA Mensagem_sair
+
+			goto_xy 26,12 ;centro do ecra
+			;cmp Nivel, 49
+			;je n1
+			;n1:
+			goto_xy 28,14
+			MOSTRA Pontuacao_n1
+			goto_xy 28,15
+			MOSTRA Pontuacao_n2
+			goto_xy 28,16
+			MOSTRA Pontuacao_n3
+			goto_xy 28,17
+			MOSTRA Pontuacao_n4
+			goto_xy 28,18
+			MOSTRA Pontuacao_n5
+
+			goto_xy		0,22 ;para o path ficar no fundo da consola quando clicamos esc
+
 
 			mov		ah,08h
 			int		21h      ;le a tecla q pressionas
@@ -923,7 +991,6 @@ WIN	PROC
 	FIM_WIN:
 						
 WIN	endp
-
 
 
 ;########################################################################
