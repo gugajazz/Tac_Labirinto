@@ -8,7 +8,7 @@ If you are interested in a more detailed description please refere to our report
 ## Running and playing it for yourself
 
 It must be ran in a 8086 emulator, we'll use DOSbox.
-- Install DOSbo by runnuning "DOSBox.exe" provided on the "Masm" directory
+- Install DOSbox by runnuning "DOSBox.exe" provided on the "Masm" directory
 - Copy the "8086" folder provided on the "Masm" directory to your "C" drive (C:\8086)
 - Copy the 3 files ```avatar.asm```,  ```labi.txt``` and ```titulo.txt``` to the ```C:\8086``` directory
 - Run DOSbox
